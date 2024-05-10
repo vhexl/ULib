@@ -96,6 +96,27 @@ int uconfig_if_init(void)
 }
 
 /**
+ * @brief Deinitialize the user configuration interface.
+ *
+ * @return int: The status code of the Deinitialization.
+ *
+ * @retval UCONFIG_IF_SUCCESS: Deinitialization success
+ * @retval Other: Denitialization failure
+ */
+int uconfig_if_deinit(void)
+{
+    // ------------------------------------------------------------------------
+    //                          User Implement Start
+    // ------------------------------------------------------------------------
+
+    // ------------------------------------------------------------------------
+    //                          User Implement End
+    // ------------------------------------------------------------------------
+
+    return UCONFIG_IF_SUCCESS;
+}
+
+/**
  * @brief Read data from persistent storage
  *
  * @note This function need user implement
