@@ -1,0 +1,24 @@
+buildType:
+  default: debug
+  choices:
+    debug:
+      short: Debug
+      long: Emit debug information
+      buildType: Debug
+    release:
+      short: Release
+      long: Optimize generated code
+      buildType: Release
+converage:
+  default: no_converage
+  choices:
+    no_converage:
+      short: No coverage
+      long: No coverage
+    converage:
+      short: Coverage
+      long: Coverage
+      settings:
+        CMAKE_CXX_FLAGS: "-g -O0 --coverage -ftest-coverage -fprofile-arcs -fprofile-exclude-files=./test/*"
+        CMAKE_C_FLAGS: "-g -O0 --coverage -ftest-coverage -fprofile-arcs -fprofile-exclude-files=./test/*"
+        CMAKE_EXE_LINKER_FLAGS: "--coverage"
