@@ -16,6 +16,10 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+typedef void (*timeout_handler)(void);
+
 int uptl_if_send(const uint8_t *data, const uint32_t len);
+
+int uptl_if_timeout(timeout_handler hdl);
 
 #endif

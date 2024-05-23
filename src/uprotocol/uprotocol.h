@@ -16,70 +16,118 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#define UPROTOCOL_STATIC_BUF_SIZE 1024
+#define UPTL_BUF_SIZE         512
+#define UPTL_PAYLOAD_SIZE_MAX (UPTL_BUF_SIZE - sizeof(struct uptl_pkt))
 
-#if UPROTOCOL_STATIC_BUF_SIZE < 1
-#error "UPROTOCOL_STATIC_BUF_SIZE must be greater than 1"
+#if UPTL_BUF_SIZE < 1
+#error "UPTL_BUF_SIZE must be greater than 1"
 #endif
 
-#define UPROTOCOL_DEBUG 0
+#define UPTL_DEBUG 0
 
-#if UPROTOCOL_DEBUG == 1
+#if UPTL_DEBUG == 1
 /* Enable debug */
-#define UPROTOCOL_PARAM_ASSERT(exp) \
-    if (!(exp)) {                   \
-        while (1)                   \
-            ;                       \
+#define UPTL_PARAM_ASSERT(exp)                                                 \
+    if (!(exp)) {                                                              \
+        while (1)                                                              \
+            ;                                                                  \
     }
-#define UPROTOCOL_LOG(fmt, ...) printf(fmt, ##__VA_ARGS__)
-#define UPROTOCOL_FIELD_PRINT(field, val, sz)       \
-    do {                                            \
-        printf("Field [%d]: ", field);              \
-        for (unsigned int idx = 0; idx < sz; idx++) \
-            printf("0x%02X ", *((val) + idx));      \
-        printf("\n");                               \
+#define UPTL_LOGE(fmt, ...) printf("[error] " fmt, ##__VA_ARGS__)
+#define UPTL_LOGI(fmt, ...) printf("[info] " fmt, ##__VA_ARGS__)
+#define UPTL_FIELD_PRINT(field, val, sz)                                       \
+    do {                                                                       \
+        printf("Field [%d]: ", field);                                         \
+        for (unsigned int idx = 0; idx < sz; idx++)                            \
+            printf("0x%02X ", *((val) + idx));                                 \
+        printf("\n");                                                          \
     } while (0)
 
 #else
 /* Disable debug */
-#define UPROTOCOL_PARAM_ASSERT(exp)
-#define UPROTOCOL_LOG(fmt, ...)
-#define UPROTOCOL_FIELD_PRINT(field, val, sz)
+#define UPTL_PARAM_ASSERT(exp)
+#define UPTL_LOGE(fmt, ...)
+#define UPTL_LOGI(fmt, ...)
+#define UPTL_FIELD_PRINT(field, val, sz)
 #endif
 
-typedef uint32_t (*cmd_handler)(const uint8_t *data, const uint32_t len);
+#define UPTL_PKT_SEG_MASK       0x80
+#define UPTL_PKT_TYPE_MASK      0x40
+#define UPTL_PKT_CMD_MASK       0x3F
+
+#define UPTL_PKT_SEG_CHANGE(h, v)  ((h) = (v | (h & (~UPTL_PKT_SEG_MASK))))
+#define UPTL_PKT_TYPE_CHANGE(h, v) ((h) = (v | (h & (~UPTL_PKT_TYPE_MASK))))
+#define UPTL_PKT_CMD_CHANGE(h, v)  ((h) = (v | (h & (~UPTL_PKT_CMD_MASK))))
+
+#define UPTL_PKT_SEG_SET(h)   ((h) |= UPTL_PKT_SEG_MASK)
+#define UPTL_PKT_TYPE_SET(h)  ((h) |= UPTL_PKT_TYPE_MASK)
+#define UPTL_PKT_CMD_SET(h)   ((h) |= UPTL_PKT_CMD_MASK)
+
+#define UPTL_PKT_SEG_RESET(h)   ((h) &= ~UPTL_PKT_SEG_MASK)
+#define UPTL_PKT_TYPE_RESET(h)  ((h) &= ~UPTL_PKT_TYPE_MASK)
+#define UPTL_PKT_CMD_RESET(h)   ((h) &= ~UPTL_PKT_CMD_MASK)
+
+#define UPTL_PKT_SEG_GET(h)     ((h) & UPTL_PKT_SEG_MASK)
+#define UPTL_PKT_TYPE_GET(h)    ((h) & UPTL_PKT_TYPE_MASK)
+#define UPTL_PKT_CMD_GET(h)     ((h) & UPTL_PKT_CMD_MASK)
+
+#define UPTL_PKT_SEG_IS(h)      ((h) & UPTL_PKT_SEG_MASK)
+#define UPTL_PKT_TYPE_IS(h)     ((h) & UPTL_PKT_TYPE_MASK)
+
+#define UPTL_HEAD_SET(seg, type, cmd)                                          \
+    ((seg & UPTL_PKT_SEG_MASK) | (type & UPTL_PKT_TYPE_MASK) |                 \
+     (cmd & UPTL_PKT_CMD_MASK))
+
+#define UPTL_PKT_CMD_INVAILD (0xFF)
+
+typedef int (*cmd_handler)(const uint8_t *data, const uint32_t len);
+
+// struct __pkt_head {
+//     uint8_t segment : 1; // 0: is end, 1: followed by data
+//     uint8_t type : 1;    // 0: request, 1: response
+//     uint8_t cmd : 5;     // cmd code
+// };
 
 struct uptl_cmd_handler {
-    uint8_t can_segment : 1; // acceptance segment 0: cannot , 1: can
-    uint8_t type : 2;        // 0: request, 1: response
-    uint8_t cmd : 5;         // limit 31
-    cmd_handler handler;     // cmd handle function pointer
+    uint8_t head;
+    cmd_handler handler; // cmd handle function pointer
 };
 
-struct uptl_frame {
-    uint8_t is_segment : 1; // 0: is end, 1: followed by data
-    uint8_t type : 2;       // 0: request, 1: response
-    uint8_t cmd : 5;        // cmd code
-    uint8_t payload[];      // params or data
+struct uptl_pkt {
+    uint8_t head;
+    uint8_t body[]; // params or data
 };
 
-enum uptl_frame_type {
-    UPTL_FRAME_REQUEST = 0,
-    UPTL_FRAME_RESPONSE,
+struct uptl_cache {
+    uint8_t head;
+    cmd_handler hdl;
+};
+
+enum uptl_pkt_type {
+    UPTL_PKT_REQUEST  = 0,
+    UPTL_PKT_RESPONSE = UPTL_PKT_TYPE_MASK,
+};
+
+enum uptl_pkt_seg {
+    UPTL_PKT_NOSEGMENT = 0,
+    UPTL_PKT_SEGMENT   = UPTL_PKT_SEG_MASK,
 };
 
 enum uptl_ret {
     UPTL_SUCCESS = 0,
-    UPTL_ERROR_FRAME_LEN,
-    UPTL_ERROR_FRAME_SEQ,
-    UPTL_ERROR_CMD_HDL_SEGMENT,
-    UPTL_ERROR_CMD_HDL_NOT_FOUND,
+    UPTL_ERROR_SEND_FAILED,
+    UPTL_ERROR_PKT_LEN,
+    UPTL_ERROR_SEGMENT,
+    UPTL_ERROR_SEGMENT_END,
+    UPTL_ERROR_SEGMENT_INAILD,
+    UPTL_ERROR_NOT_FOUND,
+    UPTL_ERROR_TIMER_START,
     // handle error
     UPTL_ERROR_INVAILD_PARAM,
     UPTL_ERROR_INTERNAL,
 };
 
-int uptl_send(const enum uptl_frame_type type, const uint8_t cmd, const uint8_t *data, uint32_t len);
+int uptl_send(const enum uptl_pkt_type type, const uint8_t cmd,
+              const uint8_t *data, uint32_t len);
 
 int uptl_process(const uint8_t *data, uint32_t len);
 

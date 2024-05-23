@@ -19,13 +19,14 @@
 // ------------------------------------------------------------------------
 //                          External Variables
 // ------------------------------------------------------------------------
-extern struct uptl_cmd_handler __ext_cmd_hdl_list[];
-extern uint32_t __ext_cmd_hdl_list_len;
+extern const struct uptl_cmd_handler __ext_cmd_list[];
+extern const uint32_t __ext_cmd_list_len;
 
 // ------------------------------------------------------------------------
 //                          Private Variables
 // ------------------------------------------------------------------------
-static uint8_t __uptl_static_buf[UPROTOCOL_STATIC_BUF_SIZE];
+static uint8_t __uptl_static_buf[UPTL_BUF_SIZE];
+static struct uptl_cache __pkt_cache = {0};
 
 // ------------------------------------------------------------------------
 //                             Private Macro
@@ -35,33 +36,44 @@ static uint8_t __uptl_static_buf[UPROTOCOL_STATIC_BUF_SIZE];
 //                           Private Functions
 // ------------------------------------------------------------------------
 
-static uint32_t __uptl_cmd_hdl_match(const struct uptl_frame *frame,
-                                     const uint32_t payload_len)
+static void __uptl_timeout_handler(void)
 {
-    for (uint32_t i = 0; i < __ext_cmd_hdl_list_len; i++) {
-        // match cmd code
-        if (__ext_cmd_hdl_list[i].cmd != frame->cmd) {
-            continue;
-        }
-        // check type
-        if (__ext_cmd_hdl_list[i].type != frame->type) {
+    __pkt_cache.head = 0;
+    __pkt_cache.hdl  = NULL;
+}
+
+static int __uptl_cmd_hdl_match(const struct uptl_pkt *pkt,
+                                const uint32_t body_len)
+{
+    const bool is_seg = (bool)UPTL_PKT_SEG_IS(pkt->head);
+
+    for (size_t i = 0; i < __ext_cmd_list_len; i++) {
+        // match cmd code and type
+        if ((__ext_cmd_list[i].head ^ pkt->head) & (~UPTL_PKT_SEG_MASK)) {
             continue;
         }
         // check segment
-        if (__ext_cmd_hdl_list[i].can_segment != 1) {
-            if (frame->is_segment == 1) {
-                return UPTL_ERROR_CMD_HDL_SEGMENT;
+        if (!UPTL_PKT_SEG_GET(__ext_cmd_list[i].head) && is_seg) {
+            return UPTL_ERROR_SEGMENT; // Unexpected segment
+        } else {
+            if (is_seg && body_len != UPTL_PAYLOAD_SIZE_MAX) {
+                return UPTL_ERROR_SEGMENT_INAILD;
+            }
+            if (__pkt_cache.hdl == NULL && is_seg) {
+                __pkt_cache.head = pkt->head;
+                __pkt_cache.hdl  = __ext_cmd_list[i].handler;
+
+                int ret = uptl_if_timeout(__uptl_timeout_handler);
+                if (ret != UPTL_SUCCESS) {
+                    return ret;
+                }
             }
         }
-
-        UPROTOCOL_LOG("UPTL[%u], cmd: %d, type: %d, len: %d\n", i,
-                      __ext_cmd_hdl_list[i].cmd, __ext_cmd_hdl_list[i].type,
-                      payload_len);
         // all prerequisite match
-        return __ext_cmd_hdl_list[i].handler(frame->payload, payload_len);
+        return __ext_cmd_list[i].handler(pkt->body, body_len);
     }
 
-    return UPTL_ERROR_CMD_HDL_NOT_FOUND;
+    return UPTL_ERROR_NOT_FOUND;
 }
 
 // ------------------------------------------------------------------------
@@ -69,13 +81,13 @@ static uint32_t __uptl_cmd_hdl_match(const struct uptl_frame *frame,
 // ------------------------------------------------------------------------
 
 /**
- * @brief Sends an UPTL protocol frame.
+ * @brief Sends an UPTL protocol package.
  *
- * This function sends an UPTL protocol frame with the given frame type,
- * command, and data. The length of the data determines the size of the payload.
+ * This function sends an UPTL protocol package with the given package type,
+ * command, and data. The length of the data determines the size of the body.
  *
- * @param type The frame type.
- * @param cmd The command for the frame.
+ * @param type The package type.
+ * @param cmd The command for the package.
  * @param data The data to be sent.
  * @param len The length of the data.
  *
@@ -83,66 +95,81 @@ static uint32_t __uptl_cmd_hdl_match(const struct uptl_frame *frame,
  *
  * @retval UPTL_SUCCESS: Send success
  */
-int uptl_send(const enum uptl_frame_type type, const uint8_t cmd,
+int uptl_send(const enum uptl_pkt_type type, const uint8_t cmd,
               const uint8_t *data, uint32_t len)
 {
-    struct uptl_frame *frame       = (struct uptl_frame *)__uptl_static_buf;
-    const uint32_t frame_head_size = sizeof(struct uptl_frame);
-    uint32_t frame_payload_size    = 0;
-    const uint32_t payload_size_max =
-        UPROTOCOL_STATIC_BUF_SIZE - frame_head_size;
+    UPTL_PARAM_ASSERT(data != NULL && len > 0 || len == 0);
+    struct uptl_pkt *pkt     = (struct uptl_pkt *)__uptl_static_buf;
+    const uint32_t head_size = sizeof(struct uptl_pkt);
+    uint32_t body_size       = 0;
 
     while (len > 0) {
-        /* function recursion global variable `__uptl_static_buf` may be
-         * modified.*/
-        frame->cmd  = cmd;
-        frame->type = type;
-        if (len > payload_size_max) {
-            frame->is_segment  = 1;
-            frame_payload_size = payload_size_max;
-            len -= payload_size_max;
+        /* function recursion `__uptl_static_buf` may be modified.*/
+        if (len > UPTL_PAYLOAD_SIZE_MAX) {
+            pkt->head = UPTL_HEAD_SET(UPTL_PKT_SEGMENT, type, cmd);
+            body_size = UPTL_PAYLOAD_SIZE_MAX;
+            len -= UPTL_PAYLOAD_SIZE_MAX;
         } else {
-            frame->is_segment  = 0;
-            frame_payload_size = len;
-            len                = 0;
+            pkt->head = UPTL_HEAD_SET(UPTL_PKT_NOSEGMENT, type, cmd);
+            body_size = len;
+            len       = 0;
         }
 
-        memcpy(frame->payload, data, frame_payload_size);
+        memcpy(pkt->body, data, body_size);
 
-        const uint32_t ret = uptl_if_send((const uint8_t *)frame,
-                                          frame_head_size + frame_payload_size);
+        int ret = uptl_if_send((const uint8_t *)pkt, head_size + body_size);
         if (ret != UPTL_SUCCESS) {
+            UPTL_LOGE("Send failed, %d bytes remaining", len);
             return ret;
         }
 
-        data += frame_payload_size;
+        data += body_size;
     }
 
     return UPTL_SUCCESS;
 }
 
 /**
- * @brief Process the UPTL frame
+ * @brief Process the UPTL package
  *
- * This function processes the UPTL (uprotocol) frame received.
- * It performs various checks and operations based on the contents of the frame.
+ * This function processes the UPTL (uprotocol) package received.
+ * It performs various checks and operations based on the contents of the
+ * package.
  *
- * @param data Pointer to the UPTL frame data
- * @param len Length of the UPTL frame data
+ * @param data Pointer to the UPTL package data
+ * @param len Length of the UPTL package data
  * @return int The return value depends on the processing result
  *
- * @retval UPTL_SUCCESS if the frame is processed successfully
- * @retval UPTL_ERROR_FRAME_LEN if the frame length is invalid
- * @retval UPTL_ERROR_FRAME_SEQ if the frame sequence is invalid
+ * @retval UPTL_SUCCESS if the package is processed successfully
+ * @retval UPTL_ERR_PACK_LEN if the package length is invalid
  */
 int uptl_process(const uint8_t *data, uint32_t len)
 {
-    if (len < sizeof(struct uptl_frame)) {
-        return UPTL_ERROR_FRAME_LEN;
+    UPTL_PARAM_ASSERT(data != NULL && len > 0);
+
+    const struct uptl_pkt *pkt = (const struct uptl_pkt *)data;
+    const uint32_t body_len    = len - sizeof(struct uptl_pkt);
+
+    UPTL_LOGI("Handle package: head = 0x%X", (uint8_t *)pkt);
+
+    // check cache
+    if (__pkt_cache.hdl != NULL) {
+        const uint8_t comp = __pkt_cache.head ^ pkt->head;
+        if (comp & (~UPTL_PKT_SEG_MASK)) {
+                __pkt_cache.head = 0;
+                __pkt_cache.hdl  = NULL;
+            return UPTL_ERROR_SEGMENT_END;
+        } else {
+            const cmd_handler hdl = __pkt_cache.hdl;
+            if (comp) {
+                __pkt_cache.head = 0;
+                __pkt_cache.hdl  = NULL;
+            } else {
+                // contine segment
+            }
+            return hdl(pkt->body, body_len);
+        }
     }
 
-    const struct uptl_frame *frame = (const struct uptl_frame *)data;
-    const uint32_t payload_len     = len - sizeof(struct uptl_frame);
-
-    return __uptl_cmd_hdl_match(frame, payload_len);
+    return __uptl_cmd_hdl_match(pkt, body_len);
 }
