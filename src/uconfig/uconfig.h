@@ -20,19 +20,19 @@
 
 #if UCFG_DEBUG == 1
 /* Enable debug */
-#define UCFG_PARAM_ASSERT(exp) \
-    if (!(exp)) {                 \
-        while (1)                 \
-            ;                     \
+#define UCFG_PARAM_ASSERT(exp)                                                 \
+    if (!(exp)) {                                                              \
+        while (1)                                                              \
+            ;                                                                  \
     }
 #define UCFG_LOGE(fmt, ...) printf("[error] " fmt, ##__VA_ARGS__)
 #define UCFG_LOGI(fmt, ...) printf("[info] " fmt, ##__VA_ARGS__)
-#define UCFG_FIELD_PRINT(field, val, sz)         \
-    do {                                            \
-        printf("Field [%d]: ", field);              \
-        for (unsigned int idx = 0; idx < sz; idx++) \
-            printf("0x%02X ", *((val) + idx));      \
-        printf("\n");                               \
+#define UCFG_FIELD_PRINT(field, val, sz)                                       \
+    do {                                                                       \
+        printf("Field [%d]: ", field);                                         \
+        for (unsigned int idx = 0; idx < sz; idx++)                            \
+            printf("0x%02X ", *((val) + idx));                                 \
+        printf("\n");                                                          \
     } while (0)
 
 #else

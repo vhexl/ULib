@@ -9,7 +9,7 @@ if(CMAKE_C_COMPILER_ID MATCHES "MSVC")
     add_compile_options(/wd5045)
 endif()
 
-# SET(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin) 
+# SET(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin)
 add_subdirectory(src/)
 
 if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
@@ -23,5 +23,3 @@ endif()
 configure_file("./CTestCustom.cmake.in"
                 ${CMAKE_BINARY_DIR}/CTestCustom.cmake
                 @ONLY)
-
-

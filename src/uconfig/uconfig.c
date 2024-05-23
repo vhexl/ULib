@@ -34,11 +34,11 @@ extern const uint8_t __ext_uconfig_inst_max;
 //                             Private Macro
 // ------------------------------------------------------------------------
 
-#define UCFG_FIELD_SIZE(field)                                              \
+#define UCFG_FIELD_SIZE(field)                                                 \
     ((uint32_t)(__ext_uconfig_field_map[field + 1] -                           \
                 __ext_uconfig_field_map[field]))
 
-#define UCFG_FIELD_IDX(field)                                               \
+#define UCFG_FIELD_IDX(field)                                                  \
     (((uint8_t *)(&__ext_uconfig_inst)) + __ext_uconfig_field_map[field])
 
 // ------------------------------------------------------------------------
@@ -103,8 +103,7 @@ int ucfg_read(const uint32_t field, uint8_t *data, const uint32_t size)
  *
  * @retval Other: interface return error
  */
-int ucfg_write(const uint32_t field, const uint8_t *data,
-                  const uint32_t size)
+int ucfg_write(const uint32_t field, const uint8_t *data, const uint32_t size)
 {
     // Check if field identifier is valid
     if (field >= __ext_uconfig_field_map_max) {

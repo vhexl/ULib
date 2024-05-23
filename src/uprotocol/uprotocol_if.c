@@ -25,8 +25,8 @@ static uint32_t __example_cmd_handler(const uint8_t *data, const uint32_t len)
 struct uptl_cmd_handler __ext_cmd_list[] = {
     // example implement
     {
-        .head = UPTL_HEAD_SET(UPTL_PKT_NOSEGMENT, UPTL_PKT_REQUEST, 0x00),
-        .handler     = __example_cmd_handler,
+        .head    = UPTL_HEAD_SET(UPTL_PKT_NOSEGMENT, UPTL_PKT_REQUEST, 0x00),
+        .handler = __example_cmd_handler,
     },
     // ------------------------------------------------------------------------
     //                          User Implement Start
@@ -64,7 +64,7 @@ int uptl_if_send(const uint8_t *data, const uint32_t len)
 
 /**
  * @brief Uprotocol start timeout handle timer
- * 
+ *
  * @param hdl timeout handler
  * @return Uprotocol error code
  * @retval UPTL_SUCCESS: Start timer success

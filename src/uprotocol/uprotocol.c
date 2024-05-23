@@ -156,8 +156,8 @@ int uptl_process(const uint8_t *data, uint32_t len)
     if (__pkt_cache.hdl != NULL) {
         const uint8_t comp = __pkt_cache.head ^ pkt->head;
         if (comp & (~UPTL_PKT_SEG_MASK)) {
-                __pkt_cache.head = 0;
-                __pkt_cache.hdl  = NULL;
+            __pkt_cache.head = 0;
+            __pkt_cache.hdl  = NULL;
             return UPTL_ERROR_SEGMENT_END;
         } else {
             const cmd_handler hdl = __pkt_cache.hdl;

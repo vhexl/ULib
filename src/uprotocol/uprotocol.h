@@ -50,28 +50,28 @@
 #define UPTL_FIELD_PRINT(field, val, sz)
 #endif
 
-#define UPTL_PKT_SEG_MASK       0x80
-#define UPTL_PKT_TYPE_MASK      0x40
-#define UPTL_PKT_CMD_MASK       0x3F
+#define UPTL_PKT_SEG_MASK          0x80
+#define UPTL_PKT_TYPE_MASK         0x40
+#define UPTL_PKT_CMD_MASK          0x3F
 
 #define UPTL_PKT_SEG_CHANGE(h, v)  ((h) = (v | (h & (~UPTL_PKT_SEG_MASK))))
 #define UPTL_PKT_TYPE_CHANGE(h, v) ((h) = (v | (h & (~UPTL_PKT_TYPE_MASK))))
 #define UPTL_PKT_CMD_CHANGE(h, v)  ((h) = (v | (h & (~UPTL_PKT_CMD_MASK))))
 
-#define UPTL_PKT_SEG_SET(h)   ((h) |= UPTL_PKT_SEG_MASK)
-#define UPTL_PKT_TYPE_SET(h)  ((h) |= UPTL_PKT_TYPE_MASK)
-#define UPTL_PKT_CMD_SET(h)   ((h) |= UPTL_PKT_CMD_MASK)
+#define UPTL_PKT_SEG_SET(h)        ((h) |= UPTL_PKT_SEG_MASK)
+#define UPTL_PKT_TYPE_SET(h)       ((h) |= UPTL_PKT_TYPE_MASK)
+#define UPTL_PKT_CMD_SET(h)        ((h) |= UPTL_PKT_CMD_MASK)
 
-#define UPTL_PKT_SEG_RESET(h)   ((h) &= ~UPTL_PKT_SEG_MASK)
-#define UPTL_PKT_TYPE_RESET(h)  ((h) &= ~UPTL_PKT_TYPE_MASK)
-#define UPTL_PKT_CMD_RESET(h)   ((h) &= ~UPTL_PKT_CMD_MASK)
+#define UPTL_PKT_SEG_RESET(h)      ((h) &= ~UPTL_PKT_SEG_MASK)
+#define UPTL_PKT_TYPE_RESET(h)     ((h) &= ~UPTL_PKT_TYPE_MASK)
+#define UPTL_PKT_CMD_RESET(h)      ((h) &= ~UPTL_PKT_CMD_MASK)
 
-#define UPTL_PKT_SEG_GET(h)     ((h) & UPTL_PKT_SEG_MASK)
-#define UPTL_PKT_TYPE_GET(h)    ((h) & UPTL_PKT_TYPE_MASK)
-#define UPTL_PKT_CMD_GET(h)     ((h) & UPTL_PKT_CMD_MASK)
+#define UPTL_PKT_SEG_GET(h)        ((h) & UPTL_PKT_SEG_MASK)
+#define UPTL_PKT_TYPE_GET(h)       ((h) & UPTL_PKT_TYPE_MASK)
+#define UPTL_PKT_CMD_GET(h)        ((h) & UPTL_PKT_CMD_MASK)
 
-#define UPTL_PKT_SEG_IS(h)      ((h) & UPTL_PKT_SEG_MASK)
-#define UPTL_PKT_TYPE_IS(h)     ((h) & UPTL_PKT_TYPE_MASK)
+#define UPTL_PKT_SEG_IS(h)         ((h) & UPTL_PKT_SEG_MASK)
+#define UPTL_PKT_TYPE_IS(h)        ((h) & UPTL_PKT_TYPE_MASK)
 
 #define UPTL_HEAD_SET(seg, type, cmd)                                          \
     ((seg & UPTL_PKT_SEG_MASK) | (type & UPTL_PKT_TYPE_MASK) |                 \
