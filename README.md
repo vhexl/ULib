@@ -1,4 +1,5 @@
 # ULib
+![workflow status](https://github.com/vhexl/ULib/actions/workflows/cmake-multi-platform.yml/badge.svg)
 This repository has some common business layer implementations, that implement in the form of a module usage.
 
 You can use these modules via `#include`, there is a macro like `XXX_DEBUG` in all modules, and you can enable debugging logging via `#define XXX_DEBUG 1`.
@@ -40,4 +41,3 @@ This easy protocol for point to point communication, look like RPC protocol, is 
     + Refer source: [./test/test_uprotocol_if.c](./test/test_uprotocol_if.c)
 
 TODO: Secure feature, for macro switch, predefine cmd handler
-
