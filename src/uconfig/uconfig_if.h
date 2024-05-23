@@ -10,14 +10,14 @@
  *
  */
 
-#ifndef __UCONFIG_IF_H
-#define __UCONFIG_IF_H
+#ifndef __UCFG_IF_H
+#define __UCFG_IF_H
 
 #include <stdint.h>
 #include <stdbool.h>
 
 enum uconfig_if_ret {
-    UCONFIG_IF_SUCCESS = 0,
+    UCFG_IF_SUCCESS = 0,
 };
 
 int uconfig_if_init(void);

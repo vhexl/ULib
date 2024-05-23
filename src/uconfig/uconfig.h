@@ -16,17 +16,18 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#define UCONFIG_DEBUG 0
+#define UCFG_DEBUG 0
 
-#if UCONFIG_DEBUG == 1
+#if UCFG_DEBUG == 1
 /* Enable debug */
-#define UCONFIG_PARAM_ASSERT(exp) \
+#define UCFG_PARAM_ASSERT(exp) \
     if (!(exp)) {                 \
         while (1)                 \
             ;                     \
     }
-#define UCONFIG_LOG(fmt, ...) printf(fmt, ##__VA_ARGS__)
-#define UCONFIG_FIELD_PRINT(field, val, sz)         \
+#define UCFG_LOGE(fmt, ...) printf("[error] " fmt, ##__VA_ARGS__)
+#define UCFG_LOGI(fmt, ...) printf("[info] " fmt, ##__VA_ARGS__)
+#define UCFG_FIELD_PRINT(field, val, sz)         \
     do {                                            \
         printf("Field [%d]: ", field);              \
         for (unsigned int idx = 0; idx < sz; idx++) \
@@ -36,25 +37,28 @@
 
 #else
 /* Disable debug */
-#define UCONFIG_PARAM_ASSERT(exp)
-#define UCONFIG_LOG(fmt, ...)
-#define UCONFIG_FIELD_PRINT(field, val, sz)
+#define UCFG_PARAM_ASSERT(exp)
+#define UCFG_LOG(fmt, ...)
+#define UCFG_FIELD_PRINT(field, val, sz)
 #endif
 
-enum uconfig_ret {
-    UCONFIG_SUCCESS = 0,
-    UCONFIG_ERROR_INVALID_FIELD,
-    UCONFIG_ERROR_SIZE_MISMATCH,
+enum ucfg_ret {
+    UCFG_SUCCESS = 0,
+    UCFG_ERROR_INVALID_FIELD,
+    UCFG_ERROR_SIZE_MISMATCH,
+    // handle error
+    UCFG_ERROR_INVAILD_PARAM,
+    UCFG_ERROR_INTERNAL,
 };
 
-int uconfig_read(const uint32_t field, uint8_t *data, const uint32_t size);
+int ucfg_read(const uint32_t field, uint8_t *data, const uint32_t size);
 
-int uconfig_write(const uint32_t field, const uint8_t *data, const uint32_t size);
+int ucfg_write(const uint32_t field, const uint8_t *data, const uint32_t size);
 
-int uconfig_restore(void);
+int ucfg_restore(void);
 
-int uconfig_init(void);
+int ucfg_init(void);
 
-int uconfig_deinit(void);
+int ucfg_deinit(void);
 
 #endif

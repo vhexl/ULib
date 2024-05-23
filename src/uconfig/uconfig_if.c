@@ -62,7 +62,7 @@ const uint8_t __ext_uconfig_inst_max      = sizeof(struct uconfig_inst);
  *
  * @return int: The status code of the initialization.
  *
- * @retval UCONFIG_IF_SUCCESS: Initialization success
+ * @retval UCFG_IF_SUCCESS: Initialization success
  * @retval Other: Initialization failure
  */
 int uconfig_if_init(void)
@@ -75,7 +75,7 @@ int uconfig_if_init(void)
     //                          User Implement End
     // ------------------------------------------------------------------------
 
-    return UCONFIG_IF_SUCCESS;
+    return UCFG_IF_SUCCESS;
 }
 
 /**
@@ -83,7 +83,7 @@ int uconfig_if_init(void)
  *
  * @return int: The status code of the Deinitialization.
  *
- * @retval UCONFIG_IF_SUCCESS: Deinitialization success
+ * @retval UCFG_IF_SUCCESS: Deinitialization success
  * @retval Other: Denitialization failure
  */
 int uconfig_if_deinit(void)
@@ -96,7 +96,7 @@ int uconfig_if_deinit(void)
     //                          User Implement End
     // ------------------------------------------------------------------------
 
-    return UCONFIG_IF_SUCCESS;
+    return UCFG_IF_SUCCESS;
 }
 
 /**
@@ -110,7 +110,7 @@ int uconfig_if_deinit(void)
  *
  * @return int: uconfig error code
  *
- * @retval UCONFIG_IF_SUCCESS: if the data was successfully written
+ * @retval UCFG_IF_SUCCESS: if the data was successfully written
  * @retval Other: interface return error
  */
 int uconfig_if_read(const uint32_t field, uint8_t *data, const uint32_t size)
@@ -123,7 +123,7 @@ int uconfig_if_read(const uint32_t field, uint8_t *data, const uint32_t size)
     //                          User Implement End
     // ------------------------------------------------------------------------
 
-    return UCONFIG_IF_SUCCESS;
+    return UCFG_IF_SUCCESS;
 }
 
 /**
@@ -137,7 +137,7 @@ int uconfig_if_read(const uint32_t field, uint8_t *data, const uint32_t size)
  *
  * @return int: uconfig error code
  *
- * @retval UCONFIG_IF_SUCCESS: if the data was successfully written
+ * @retval UCFG_IF_SUCCESS: if the data was successfully written
  * @retval Other: interface return error
  */
 int uconfig_if_write(const uint32_t field, const uint8_t *data,
@@ -151,5 +151,5 @@ int uconfig_if_write(const uint32_t field, const uint8_t *data,
     //                          User Implement End
     // ------------------------------------------------------------------------
 
-    return UCONFIG_IF_SUCCESS;
+    return UCFG_IF_SUCCESS;
 }

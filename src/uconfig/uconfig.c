@@ -34,11 +34,11 @@ extern const uint8_t __ext_uconfig_inst_max;
 //                             Private Macro
 // ------------------------------------------------------------------------
 
-#define UCONFIG_FIELD_SIZE(field)                                              \
+#define UCFG_FIELD_SIZE(field)                                              \
     ((uint32_t)(__ext_uconfig_field_map[field + 1] -                           \
                 __ext_uconfig_field_map[field]))
 
-#define UCONFIG_FIELD_IDX(field)                                               \
+#define UCFG_FIELD_IDX(field)                                               \
     (((uint8_t *)(&__ext_uconfig_inst)) + __ext_uconfig_field_map[field])
 
 // ------------------------------------------------------------------------
@@ -57,30 +57,30 @@ extern const uint8_t __ext_uconfig_inst_max;
  *
  * @return int uconfig error code
  *
- * @retval UCONFIG_SUCCESS: if the operation was successful
- * @retval UCONFIG_ERROR_INVALID_FIELD: if the field index is invalid
- * @retval UCONFIG_ERROR_SIZE_MISMATCH: if the size does not match the expected
+ * @retval UCFG_SUCCESS: if the operation was successful
+ * @retval UCFG_ERROR_INVALID_FIELD: if the field index is invalid
+ * @retval UCFG_ERROR_SIZE_MISMATCH: if the size does not match the expected
  * size for the field.
  */
-int uconfig_read(const uint32_t field, uint8_t *data, const uint32_t size)
+int ucfg_read(const uint32_t field, uint8_t *data, const uint32_t size)
 {
     // Check if field index is valid
     if (field >= __ext_uconfig_field_map_max) {
-        return UCONFIG_ERROR_INVALID_FIELD;
+        return UCFG_ERROR_INVALID_FIELD;
     }
 
     // Check if size matches expected size for the field
-    if (size != UCONFIG_FIELD_SIZE(field)) {
-        return UCONFIG_ERROR_SIZE_MISMATCH;
+    if (size != UCFG_FIELD_SIZE(field)) {
+        return UCFG_ERROR_SIZE_MISMATCH;
     }
 
     // Read from memory and store in data buffer
-    memcpy(data, UCONFIG_FIELD_IDX(field), size);
+    memcpy(data, UCFG_FIELD_IDX(field), size);
 
-    UCONFIG_LOG("UCONFIG Read: ");
-    UCONFIG_FIELD_PRINT(field, data, size);
+    UCFG_LOG("UCFG Read: ");
+    UCFG_FIELD_PRINT(field, data, size);
 
-    return UCONFIG_SUCCESS;
+    return UCFG_SUCCESS;
 }
 
 /**
@@ -96,39 +96,39 @@ int uconfig_read(const uint32_t field, uint8_t *data, const uint32_t size)
  *
  * @return int uconfig error code
  *
- * @retval UCONFIG_SUCCESS: if the write operation is successful
- * @retval UCONFIG_ERROR_INVALID_FIELD: if the field identifier is invalid,
- * @retval UCONFIG_ERROR_SIZE_MISMATCH: if the size of the data does not match
+ * @retval UCFG_SUCCESS: if the write operation is successful
+ * @retval UCFG_ERROR_INVALID_FIELD: if the field identifier is invalid,
+ * @retval UCFG_ERROR_SIZE_MISMATCH: if the size of the data does not match
  *         the expected size for the specified field.
  *
  * @retval Other: interface return error
  */
-int uconfig_write(const uint32_t field, const uint8_t *data,
+int ucfg_write(const uint32_t field, const uint8_t *data,
                   const uint32_t size)
 {
     // Check if field identifier is valid
     if (field >= __ext_uconfig_field_map_max) {
-        return UCONFIG_ERROR_INVALID_FIELD;
+        return UCFG_ERROR_INVALID_FIELD;
     }
 
     // Check if size matches the expected size for the specified field
-    if (size != UCONFIG_FIELD_SIZE(field)) {
-        return UCONFIG_ERROR_SIZE_MISMATCH;
+    if (size != UCFG_FIELD_SIZE(field)) {
+        return UCFG_ERROR_SIZE_MISMATCH;
     }
 
-    UCONFIG_LOG("UCONFIG Write: ");
-    UCONFIG_FIELD_PRINT(field, data, size);
+    UCFG_LOG("UCFG Write: ");
+    UCFG_FIELD_PRINT(field, data, size);
 
     // Write the configuration data to persistent storage
-    uint32_t ret = uconfig_if_write(field, data, size);
-    if (ret != UCONFIG_SUCCESS) {
+    int ret = uconfig_if_write(field, data, size);
+    if (ret != UCFG_SUCCESS) {
         return ret;
     }
 
     // Write the configuration data to memory
-    memcpy(UCONFIG_FIELD_IDX(field), data, size);
+    memcpy(UCFG_FIELD_IDX(field), data, size);
 
-    return UCONFIG_SUCCESS;
+    return UCFG_SUCCESS;
 }
 
 /**
@@ -140,23 +140,22 @@ int uconfig_write(const uint32_t field, const uint8_t *data,
  *
  * @return int uconfig error code
  *
- * @retval UCONFIG_SUCCESS: The restoration was successful.
+ * @retval UCFG_SUCCESS: The restoration was successful.
  * @retval Other: If an error occurred during the restoration process.
  */
-int uconfig_restore(void)
+int ucfg_restore(void)
 {
     memcpy(&__ext_uconfig_inst, &__ext_uconfig_inst_dflt,
            __ext_uconfig_inst_max);
 
-    for (uint32_t i = 0; i < __ext_uconfig_field_map_max; i++) {
-        uint32_t ret =
-            uconfig_write(i, UCONFIG_FIELD_IDX(i), UCONFIG_FIELD_SIZE(i));
-        if (ret != UCONFIG_SUCCESS) {
+    for (size_t i = 0; i < __ext_uconfig_field_map_max; i++) {
+        int ret = ucfg_write(i, UCFG_FIELD_IDX(i), UCFG_FIELD_SIZE(i));
+        if (ret != UCFG_SUCCESS) {
             return ret;
         }
     }
 
-    return UCONFIG_SUCCESS;
+    return UCFG_SUCCESS;
 }
 
 /**
@@ -164,27 +163,26 @@ int uconfig_restore(void)
  *
  * @return int uconfig error code
  *
- * @retval UCONFIG_SUCCESS: Initialization successful.
+ * @retval UCFG_SUCCESS: Initialization successful.
  * @retval Other: Initialization failed.
  */
-int uconfig_init(void)
+int ucfg_init(void)
 {
-    uint32_t ret = uconfig_if_init();
-    if (ret != UCONFIG_SUCCESS) {
+    int ret = uconfig_if_init();
+    if (ret != UCFG_SUCCESS) {
         return ret;
     }
 
-    for (uint32_t i = 0; i < __ext_uconfig_field_map_max; i++) {
-        uint32_t ret =
-            uconfig_if_read(i, UCONFIG_FIELD_IDX(i), UCONFIG_FIELD_SIZE(i));
-        if (ret != UCONFIG_SUCCESS) {
+    for (size_t i = 0; i < __ext_uconfig_field_map_max; i++) {
+        ret = uconfig_if_read(i, UCFG_FIELD_IDX(i), UCFG_FIELD_SIZE(i));
+        if (ret != UCFG_SUCCESS) {
             return ret;
         }
 
-        UCONFIG_FIELD_PRINT(i, UCONFIG_FIELD_IDX(i), UCONFIG_FIELD_SIZE(i));
+        UCFG_FIELD_PRINT(i, UCFG_FIELD_IDX(i), UCFG_FIELD_SIZE(i));
     }
 
-    return UCONFIG_SUCCESS;
+    return UCFG_SUCCESS;
 }
 
 /**
@@ -192,7 +190,7 @@ int uconfig_init(void)
  *
  * @return int From uconfig_if_deinit error code
  */
-int uconfig_deinit(void)
+int ucfg_deinit(void)
 {
     return uconfig_if_deinit();
 }
