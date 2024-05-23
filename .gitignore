@@ -1,4 +1,6 @@
 .vscode
+venv
 build
+out
 *.code-workspace
 ULib Workspace Start.bat

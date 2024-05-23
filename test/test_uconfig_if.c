@@ -15,6 +15,10 @@
 
 #include "test_uconfig_if.h"
 
+bool test_init_if_flag  = true;
+bool test_read_if_flag  = true;
+bool test_write_if_flag = true;
+
 PACK(struct uconfig_inst {
     // ----Instance declaration----
     // -------User Implement-------
@@ -83,16 +87,18 @@ const uint8_t __ext_uconfig_inst_max      = sizeof(struct uconfig_inst);
  *
  * @return int: The status code of the initialization.
  *
- * @retval UCONFIG_IF_SUCCESS: Initialization success
+ * @retval UCFG_IF_SUCCESS: Initialization success
  * @retval Other: Initialization failure
  */
 int uconfig_if_init(void)
 {
     // ---------------Initialize---------------
     // -------------User Implement-------------
-
+    if (!test_init_if_flag){
+        return UCFG_ERROR_INTERNAL;
+    }
     // ----------------------------------------
-    return UCONFIG_IF_SUCCESS;
+    return UCFG_IF_SUCCESS;
 }
 
 /**
@@ -100,7 +106,7 @@ int uconfig_if_init(void)
  *
  * @return int: The status code of the Deinitialization.
  *
- * @retval UCONFIG_IF_SUCCESS: Deinitialization success
+ * @retval UCFG_IF_SUCCESS: Deinitialization success
  * @retval Other: Denitialization failure
  */
 int uconfig_if_deinit(void)
@@ -113,7 +119,7 @@ int uconfig_if_deinit(void)
     //                          User Implement End
     // ------------------------------------------------------------------------
 
-    return UCONFIG_IF_SUCCESS;
+    return UCFG_IF_SUCCESS;
 }
 
 /**
@@ -127,13 +133,16 @@ int uconfig_if_deinit(void)
  *
  * @return int: uconfig error code
  *
- * @retval UCONFIG_IF_SUCCESS: if the data was successfully written
+ * @retval UCFG_IF_SUCCESS: if the data was successfully written
  * @retval Other: interface return error
  */
 int uconfig_if_read(const uint32_t field, uint8_t *data, const uint32_t size)
 {
     // --------------Read data from persistent storage-------------
     // ----------------------User Implement------------------------
+    if (!test_read_if_flag) {
+        return UCFG_ERROR_INTERNAL;
+    }
     switch (field) {
         case 0:
             memcpy(data, &f1, size);
@@ -164,11 +173,11 @@ int uconfig_if_read(const uint32_t field, uint8_t *data, const uint32_t size)
             break;
         default:
             // no such field
-            return 1;
+            return UCFG_ERROR_INVAILD_PARAM;
     }
     // ------------------------------------------------------------
 
-    return UCONFIG_IF_SUCCESS;
+    return UCFG_IF_SUCCESS;
 }
 
 /**
@@ -182,7 +191,7 @@ int uconfig_if_read(const uint32_t field, uint8_t *data, const uint32_t size)
  *
  * @return int: uconfig error code
  *
- * @retval UCONFIG_IF_SUCCESS: if the data was successfully written
+ * @retval UCFG_IF_SUCCESS: if the data was successfully written
  * @retval Other: interface return error
  */
 int uconfig_if_write(const uint32_t field, const uint8_t *data,
@@ -190,6 +199,9 @@ int uconfig_if_write(const uint32_t field, const uint8_t *data,
 {
     // --------------Write data from persistent storage-------------
     // ----------------------User Implement------------------------
+    if (!test_write_if_flag) {
+        return UCFG_ERROR_INTERNAL;
+    }
     switch (field) {
         case 0:
             memcpy(&f1, data, size);
@@ -221,9 +233,9 @@ int uconfig_if_write(const uint32_t field, const uint8_t *data,
             break;
 
         default:
-            return 1;
+            return UCFG_ERROR_INVAILD_PARAM;
     }
     // ------------------------------------------------------------
 
-    return UCONFIG_IF_SUCCESS;
+    return UCFG_IF_SUCCESS;
 }

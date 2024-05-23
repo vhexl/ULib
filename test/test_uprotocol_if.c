@@ -15,15 +15,20 @@
 #include "uprotocol_if.h"
 #include "ULib.h"
 
-#define UPTL_VERIFY_FAIL 0x8001
+#include "test.h"
 
-uint8_t test_buf[8192] = {0x55};
+bool uptl_if_send_flag    = true;
+bool uptl_if_timeout_flag = true;
 
-uint8_t test_0x01_buf[8192] = {0xAA};
-uint32_t test_0x01_idx      = 0;
+timeout_handler test_timeout_handle;
 
-uint8_t test_0x02_buf[8192] = {0xEE};
-uint32_t test_0x02_idx      = 0;
+uint8_t test_buf[TEST_BUF_SIZE] = {0x55};
+
+uint8_t test_0x01_buf[TEST_BUF_SIZE] = {0xAA};
+uint32_t test_0x01_idx               = 0;
+
+uint8_t test_0x02_buf[TEST_BUF_SIZE] = {0xEE};
+uint32_t test_0x02_idx               = 0;
 
 // 0x00 used variable
 uint8_t test_0x00_p1  = 0xAA;
@@ -35,7 +40,7 @@ double test_0x00_p6   = 2.14444444444;
 bool test_0x00_p7     = true;
 char test_0x00_p8[16] = "123456789abcdef";
 
-static uint32_t test_0x00_req(const uint8_t *data, const uint32_t len)
+static int test_0x00_req(const uint8_t *data, const uint32_t len)
 {
     // data read
     if (len == 1) {
@@ -45,57 +50,57 @@ static uint32_t test_0x00_req(const uint8_t *data, const uint32_t len)
                 uint8_t resp[2];
                 resp[0] = 1;
                 memcpy(resp + 1, &test_0x00_p1, 1);
-                uint32_t ret = uptl_send(UPTL_FRAME_RESPONSE, 0x00, resp, 2);
+                int ret = uptl_send(UPTL_PKT_RESPONSE, 0x00, resp, 2);
                 return ret;
             }
             case 2: {
                 uint8_t resp[3];
                 resp[0] = 2;
                 memcpy(resp + 1, &test_0x00_p2, 2);
-                uint32_t ret = uptl_send(UPTL_FRAME_RESPONSE, 0x00, resp, 3);
+                int ret = uptl_send(UPTL_PKT_RESPONSE, 0x00, resp, 3);
                 return ret;
             }
             case 3: {
                 uint8_t resp[5];
                 resp[0] = 3;
                 memcpy(resp + 1, &test_0x00_p3, 4);
-                uint32_t ret = uptl_send(UPTL_FRAME_RESPONSE, 0x00, resp, 5);
+                int ret = uptl_send(UPTL_PKT_RESPONSE, 0x00, resp, 5);
                 return ret;
             }
             case 4: {
                 uint8_t resp[9];
                 resp[0] = 4;
                 memcpy(resp + 1, &test_0x00_p4, 8);
-                uint32_t ret = uptl_send(UPTL_FRAME_RESPONSE, 0x00, resp, 9);
+                int ret = uptl_send(UPTL_PKT_RESPONSE, 0x00, resp, 9);
                 return ret;
             }
             case 5: {
                 uint8_t resp[5];
                 resp[0] = 5;
                 memcpy(resp + 1, &test_0x00_p5, 4);
-                uint32_t ret = uptl_send(UPTL_FRAME_RESPONSE, 0x00, resp, 5);
+                int ret = uptl_send(UPTL_PKT_RESPONSE, 0x00, resp, 5);
                 return ret;
             }
             case 6: {
                 uint8_t resp[9];
                 resp[0] = 6;
                 memcpy(resp + 1, &test_0x00_p6, 8);
-                uint32_t ret = uptl_send(UPTL_FRAME_RESPONSE, 0x00, resp, 9);
+                int ret = uptl_send(UPTL_PKT_RESPONSE, 0x00, resp, 9);
                 return ret;
             }
             case 7: {
                 uint8_t resp[1 + sizeof(bool)];
                 resp[0] = 7;
                 memcpy(resp + 1, &test_0x00_p7, sizeof(bool));
-                uint32_t ret = uptl_send(UPTL_FRAME_RESPONSE, 0x00, resp,
-                                         sizeof(bool) + 1);
+                int ret =
+                    uptl_send(UPTL_PKT_RESPONSE, 0x00, resp, sizeof(bool) + 1);
                 return ret;
             }
             case 8: {
                 uint8_t resp[17];
                 resp[0] = 8;
                 memcpy(resp + 1, &test_0x00_p8, 16);
-                uint32_t ret = uptl_send(UPTL_FRAME_RESPONSE, 0x00, resp, 17);
+                int ret = uptl_send(UPTL_PKT_RESPONSE, 0x00, resp, 17);
                 return ret;
             }
             default:
@@ -112,7 +117,7 @@ static uint32_t test_0x00_req(const uint8_t *data, const uint32_t len)
                 uint8_t resp[2];
                 resp[0] = 1;
                 memcpy(resp + 1, &test_0x00_p1, 1);
-                uint32_t ret = uptl_send(UPTL_FRAME_RESPONSE, 0x00, resp, 2);
+                int ret = uptl_send(UPTL_PKT_RESPONSE, 0x00, resp, 2);
                 return ret;
             }
             case 2: {
@@ -123,7 +128,7 @@ static uint32_t test_0x00_req(const uint8_t *data, const uint32_t len)
                 uint8_t resp[3];
                 resp[0] = 2;
                 memcpy(resp + 1, &test_0x00_p2, 2);
-                uint32_t ret = uptl_send(UPTL_FRAME_RESPONSE, 0x00, resp, 3);
+                int ret = uptl_send(UPTL_PKT_RESPONSE, 0x00, resp, 3);
                 return ret;
             }
             case 3: {
@@ -134,7 +139,7 @@ static uint32_t test_0x00_req(const uint8_t *data, const uint32_t len)
                 uint8_t resp[5];
                 resp[0] = 3;
                 memcpy(resp + 1, &test_0x00_p3, 4);
-                uint32_t ret = uptl_send(UPTL_FRAME_RESPONSE, 0x00, resp, 5);
+                int ret = uptl_send(UPTL_PKT_RESPONSE, 0x00, resp, 5);
                 return ret;
             }
             case 4: {
@@ -145,7 +150,7 @@ static uint32_t test_0x00_req(const uint8_t *data, const uint32_t len)
                 uint8_t resp[9];
                 resp[0] = 4;
                 memcpy(resp + 1, &test_0x00_p4, 8);
-                uint32_t ret = uptl_send(UPTL_FRAME_RESPONSE, 0x00, resp, 9);
+                int ret = uptl_send(UPTL_PKT_RESPONSE, 0x00, resp, 9);
                 return ret;
             }
             case 5: {
@@ -156,7 +161,7 @@ static uint32_t test_0x00_req(const uint8_t *data, const uint32_t len)
                 uint8_t resp[5];
                 resp[0] = 5;
                 memcpy(resp + 1, &test_0x00_p5, 4);
-                uint32_t ret = uptl_send(UPTL_FRAME_RESPONSE, 0x00, resp, 5);
+                int ret = uptl_send(UPTL_PKT_RESPONSE, 0x00, resp, 5);
                 return ret;
             }
             case 6: {
@@ -167,7 +172,7 @@ static uint32_t test_0x00_req(const uint8_t *data, const uint32_t len)
                 uint8_t resp[9];
                 resp[0] = 6;
                 memcpy(resp + 1, &test_0x00_p6, 8);
-                uint32_t ret = uptl_send(UPTL_FRAME_RESPONSE, 0x00, resp, 9);
+                int ret = uptl_send(UPTL_PKT_RESPONSE, 0x00, resp, 9);
                 return ret;
             }
             case 7: {
@@ -178,8 +183,8 @@ static uint32_t test_0x00_req(const uint8_t *data, const uint32_t len)
                 uint8_t resp[1 + sizeof(bool)];
                 resp[0] = 7;
                 memcpy(resp + 1, &test_0x00_p7, sizeof(bool));
-                uint32_t ret = uptl_send(UPTL_FRAME_RESPONSE, 0x00, resp,
-                                         sizeof(bool) + 1);
+                int ret =
+                    uptl_send(UPTL_PKT_RESPONSE, 0x00, resp, sizeof(bool) + 1);
                 return ret;
             }
             case 8: {
@@ -190,7 +195,7 @@ static uint32_t test_0x00_req(const uint8_t *data, const uint32_t len)
                 uint8_t resp[17];
                 resp[0] = 8;
                 memcpy(resp + 1, &test_0x00_p8, 16);
-                uint32_t ret = uptl_send(UPTL_FRAME_RESPONSE, 0x00, resp, 17);
+                int ret = uptl_send(UPTL_PKT_RESPONSE, 0x00, resp, 17);
                 return ret;
             }
             default:
@@ -203,7 +208,7 @@ static uint32_t test_0x00_req(const uint8_t *data, const uint32_t len)
     return UPTL_SUCCESS;
 }
 
-static uint32_t test_0x00_resp(const uint8_t *data, const uint32_t len)
+static int test_0x00_resp(const uint8_t *data, const uint32_t len)
 {
     // check
     if (len > 1) {
@@ -212,104 +217,109 @@ static uint32_t test_0x00_resp(const uint8_t *data, const uint32_t len)
                 if (memcmp(data + 1, &test_0x00_p1, 1) == 0) {
                     return UPTL_SUCCESS;
                 }
-                return UPTL_VERIFY_FAIL;
+                return UPTL_ERROR_INTERNAL;
             case 2:
                 if (memcmp(data + 1, &test_0x00_p2, 2) == 0) {
                     return UPTL_SUCCESS;
                 }
-                return UPTL_VERIFY_FAIL;
+                return UPTL_ERROR_INTERNAL;
             case 3:
                 if (memcmp(data + 1, &test_0x00_p3, 4) == 0) {
                     return UPTL_SUCCESS;
                 }
-                return UPTL_VERIFY_FAIL;
+                return UPTL_ERROR_INTERNAL;
             case 4:
                 if (memcmp(data + 1, &test_0x00_p4, 8) == 0) {
                     return UPTL_SUCCESS;
                 }
-                return UPTL_VERIFY_FAIL;
+                return UPTL_ERROR_INTERNAL;
             case 5:
                 if (memcmp(data + 1, &test_0x00_p5, 4) == 0) {
                     return UPTL_SUCCESS;
                 }
-                return UPTL_VERIFY_FAIL;
+                return UPTL_ERROR_INTERNAL;
             case 6:
                 if (memcmp(data + 1, &test_0x00_p6, 8) == 0) {
                     return UPTL_SUCCESS;
                 }
-                return UPTL_VERIFY_FAIL;
+                return UPTL_ERROR_INTERNAL;
             case 7:
                 if (memcmp(data + 1, &test_0x00_p7, sizeof(bool)) == 0) {
                     return UPTL_SUCCESS;
                 }
-                return UPTL_VERIFY_FAIL;
+                return UPTL_ERROR_INTERNAL;
             case 8:
                 if (memcmp(data + 1, &test_0x00_p8, 16) == 0) {
                     return UPTL_SUCCESS;
                 }
-                return UPTL_VERIFY_FAIL;
+                return UPTL_ERROR_INTERNAL;
             default:
-                return UPTL_VERIFY_FAIL;
+                return UPTL_ERROR_INTERNAL;
         }
     } else {
-        return UPTL_VERIFY_FAIL;
+        return UPTL_ERROR_INTERNAL;
     }
 
     return UPTL_SUCCESS;
 }
 
-static uint32_t test_0x01_req(const uint8_t *data, const uint32_t len)
+static int test_0x01_req(const uint8_t *data, const uint32_t len)
 {
-    if (test_0x01_idx + len > 8192) {
+    if (test_0x01_idx + len > TEST_BUF_SIZE) {
         return UPTL_ERROR_INVAILD_PARAM;
     }
+
     // write
     memcpy(test_0x01_buf + test_0x01_idx, data, len);
     test_0x01_idx += len;
-    uint32_t resp_len = test_0x01_idx;
-    uint32_t ret =
-        uptl_send(UPTL_FRAME_RESPONSE, 0x01, (uint8_t *)&resp_len, 4);
-    return ret;
+
+    if (len < UPTL_PAYLOAD_SIZE_MAX) {
+        uint32_t resp_len = test_0x01_idx;
+        int ret = uptl_send(UPTL_PKT_RESPONSE, 0x01, (uint8_t *)&resp_len, 4);
+        return ret;
+    }
+
+    return UPTL_SUCCESS;
 }
 
-static uint32_t test_0x01_resp(const uint8_t *data, const uint32_t len)
+static int test_0x01_resp(const uint8_t *data, const uint32_t len)
 {
     if (len != 4) {
-        return UPTL_VERIFY_FAIL;
+        return UPTL_ERROR_INTERNAL;
     }
     uint32_t resp_len;
     memcpy(&resp_len, data, 4);
     if (resp_len != test_0x01_idx) {
-        return UPTL_VERIFY_FAIL;
+        return UPTL_ERROR_INTERNAL;
     }
     // check data
     for (size_t i = 0; i < len; i++) {
         if (test_0x01_buf[i] != 255 - (i % 256)) {
-            return UPTL_VERIFY_FAIL;
+            return UPTL_ERROR_INTERNAL;
         }
     }
 
     return UPTL_SUCCESS;
 }
 
-static uint32_t test_0x02_req(const uint8_t *data, const uint32_t len)
+static int test_0x02_req(const uint8_t *data, const uint32_t len)
 {
-    for (size_t i = 0; i < 8192; i++) {
+    for (size_t i = 0; i < TEST_BUF_SIZE; i++) {
         test_0x02_buf[i] = i % 256;
     }
-    uint32_t ret = uptl_send(UPTL_FRAME_RESPONSE, 0x02, test_0x02_buf, 8192);
+    int ret = uptl_send(UPTL_PKT_RESPONSE, 0x02, test_0x02_buf, TEST_BUF_SIZE);
     return ret;
 }
 
-static uint32_t test_0x02_resp(const uint8_t *data, const uint32_t len)
+static int test_0x02_resp(const uint8_t *data, const uint32_t len)
 {
-    if (test_0x01_idx + len > 8192) {
-        return UPTL_VERIFY_FAIL;
+    if (test_0x01_idx + len > TEST_BUF_SIZE) {
+        return UPTL_ERROR_INTERNAL;
     }
 
     for (size_t i = test_0x02_idx; i < test_0x02_idx + len; i++) {
         if (test_0x02_buf[i] != i) {
-            return UPTL_VERIFY_FAIL;
+            return UPTL_ERROR_INTERNAL;
         }
     }
 
@@ -318,62 +328,83 @@ static uint32_t test_0x02_resp(const uint8_t *data, const uint32_t len)
     return UPTL_SUCCESS;
 }
 
-struct uptl_cmd_handler __ext_cmd_hdl_list[] = {
+struct uptl_cmd_handler __ext_cmd_list[] = {
     // example implement
     // {
     //     .cmd         = 0x00,
-    //     .type     = UPTL_FRAME_REQUEST,
-    //     .can_segment = 1,
+    //     .type     = UPTL_PKT_REQUEST,
+    //     .segment = 1,
     //     .handler     = NULL,
     // },
     // ------CMD Handler List------
     // -------User Implement-------
     {
-        .cmd         = 0x00,
-        .type        = UPTL_FRAME_REQUEST,
-        .can_segment = 0,
-        .handler     = test_0x00_req,
+        .head    = UPTL_HEAD_SET(UPTL_PKT_NOSEGMENT, UPTL_PKT_REQUEST, 0x00),
+        .handler = test_0x00_req,
     },
     {
-        .cmd         = 0x00,
-        .type        = UPTL_FRAME_RESPONSE,
-        .can_segment = 0,
-        .handler     = test_0x00_resp,
+        .head    = UPTL_HEAD_SET(UPTL_PKT_NOSEGMENT, UPTL_PKT_RESPONSE, 0x00),
+        .handler = test_0x00_resp,
     },
     {
-        .cmd         = 0x01,
-        .type        = UPTL_FRAME_REQUEST,
-        .can_segment = 1,
-        .handler     = test_0x01_req,
+        .head    = UPTL_HEAD_SET(UPTL_PKT_SEGMENT, UPTL_PKT_REQUEST, 0x01),
+        .handler = test_0x01_req,
     },
     {
-        .cmd         = 0x01,
-        .type        = UPTL_FRAME_RESPONSE,
-        .can_segment = 1,
-        .handler     = test_0x01_resp,
+        .head    = UPTL_HEAD_SET(UPTL_PKT_NOSEGMENT, UPTL_PKT_RESPONSE, 0x01),
+        .handler = test_0x01_resp,
     },
     {
-        .cmd         = 0x02,
-        .type        = UPTL_FRAME_REQUEST,
-        .can_segment = 0,
-        .handler     = test_0x02_req,
+        .head    = UPTL_HEAD_SET(UPTL_PKT_NOSEGMENT, UPTL_PKT_REQUEST, 0x02),
+        .handler = test_0x02_req,
     },
     {
-        .cmd         = 0x02,
-        .type        = UPTL_FRAME_RESPONSE,
-        .can_segment = 1,
-        .handler     = test_0x02_resp,
+        .head    = UPTL_HEAD_SET(UPTL_PKT_SEGMENT, UPTL_PKT_RESPONSE, 0x02),
+        .handler = test_0x02_resp,
     },
     // ----------------------------
 };
-uint32_t __ext_cmd_hdl_list_len = sizeof(__ext_cmd_hdl_list);
+uint32_t __ext_cmd_list_len = ULIB_ARRAY_MAX(__ext_cmd_list);
 
 int uptl_if_send(const uint8_t *data, const uint32_t len)
 {
-    // ------UPTL Send Interface------
-    // --------User Implement---------
+    // ------------------------------------------------------------------------
+    //                          User Implement Start
+    // ------------------------------------------------------------------------
+    if (!uptl_if_send_flag) {
+        return UPTL_ERROR_SEND_FAILED;
+    }
+
     memcpy(test_buf, data, len);
-    return uptl_process(test_buf, len);
-    // -------------------------------
+    int ret = uptl_process(test_buf, len);
+    return ret;
+    // ------------------------------------------------------------------------
+    //                          User Implement End
+    // ------------------------------------------------------------------------
     // return UPTL_SUCCESS;
+}
+
+/**
+ * @brief Uprotocol start timeout handle timer
+ *
+ * @param hdl timeout handler
+ * @return Uprotocol error code
+ * @retval UPTL_SUCCESS: Start timer success
+ * @retval Other: send failure
+ */
+int uptl_if_timeout(timeout_handler hdl)
+{
+    // ------------------------------------------------------------------------
+    //                          User Implement Start
+    // ------------------------------------------------------------------------
+
+    if (!uptl_if_timeout_flag) {
+        return UPTL_ERROR_TIMER_START;
+    }
+    test_timeout_handle = hdl;
+    // ------------------------------------------------------------------------
+    //                          User Implement End
+    // ------------------------------------------------------------------------
+
+    return UPTL_SUCCESS;
 }

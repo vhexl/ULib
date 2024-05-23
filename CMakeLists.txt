@@ -18,3 +18,10 @@ endif()
 if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME AND BUILD_TESTING)
     add_subdirectory(test)
 endif()
+
+# even commented it, coverage utils still works great
+configure_file("./CTestCustom.cmake.in"
+                ${CMAKE_BINARY_DIR}/CTestCustom.cmake
+                @ONLY)
+
+

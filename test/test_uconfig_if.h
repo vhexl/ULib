@@ -10,8 +10,8 @@
  *
  */
 
-#ifndef __TEST_UCONFIG_IF_H
-#define __TEST_UCONFIG_IF_H
+#ifndef __TEST_UCFG_IF_H
+#define __TEST_UCFG_IF_H
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -19,7 +19,7 @@
 #include "ULib.h"
 
 enum uconfig_if_ret {
-    UCONFIG_IF_SUCCESS = 0,
+    UCFG_IF_SUCCESS = 0,
 };
 
 int uconfig_if_init(void);
