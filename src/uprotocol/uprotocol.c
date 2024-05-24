@@ -67,10 +67,13 @@ static int __uptl_cmd_hdl_match(const struct uptl_pkt *pkt,
                 if (ret != UPTL_SUCCESS) {
                     return ret;
                 }
+
+                return __ext_cmd_list[i].handler(pkt->body, body_len,
+                                                 UPTL_EXT_SEG_START);
             }
         }
         // all prerequisite match
-        return __ext_cmd_list[i].handler(pkt->body, body_len);
+        return __ext_cmd_list[i].handler(pkt->body, body_len, UPTL_EXT_NOSEG);
     }
 
     return UPTL_ERROR_NOT_FOUND;
@@ -164,10 +167,11 @@ int uptl_process(const uint8_t *data, uint32_t len)
             if (comp) {
                 __pkt_cache.head = 0;
                 __pkt_cache.hdl  = NULL;
+                return hdl(pkt->body, body_len, UPTL_EXT_SEG_END);
             } else {
                 // contine segment
+                return hdl(pkt->body, body_len, UPTL_EXT_SEG_CONTINUE);
             }
-            return hdl(pkt->body, body_len);
         }
     }
 

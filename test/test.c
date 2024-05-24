@@ -294,6 +294,8 @@ void test_uprotocol(void)
     extern bool uptl_if_send_flag;
     extern bool uptl_if_timeout_flag;
 
+    extern enum uptl_ext uptl_ext_flag;
+
     extern uint32_t test_0x01_idx;
     extern uint32_t test_0x02_idx;
 
@@ -538,6 +540,50 @@ void test_uprotocol(void)
             TEST_FAIL();
         }
     }
+
+    // ---------------------------------------------------------------------------------------
+    //                                Extra test
+    // ---------------------------------------------------------------------------------------
+    // 0x03 request test
+    ret = uptl_send(UPTL_PKT_REQUEST, 0x03, test_send_0x01_buf, 1);
+    TEST_ASSERT_EQUAL(uptl_ext_flag, UPTL_EXT_NOSEG);
+    // 0x03 response test
+    ret = uptl_send(UPTL_PKT_RESPONSE, 0x03, test_send_0x01_buf, 1);
+    TEST_ASSERT_EQUAL(uptl_ext_flag, UPTL_EXT_NOSEG);
+
+    // 0x04 request test
+    test_pkt->head = UPTL_HEAD_SET(UPTL_PKT_SEGMENT, UPTL_PKT_REQUEST, 0x04);
+    ret            = uptl_process((uint8_t *)test_pkt, pkt_len_max);
+    TEST_ASSERT_EQUAL(uptl_ext_flag, UPTL_EXT_SEG_START);
+    for (size_t i = 0; i < 5; i++) {
+        test_pkt->head =
+            UPTL_HEAD_SET(UPTL_PKT_SEGMENT, UPTL_PKT_REQUEST, 0x04);
+        ret = uptl_process((uint8_t *)test_pkt, pkt_len_max);
+        TEST_ASSERT_EQUAL(uptl_ext_flag, UPTL_EXT_SEG_CONTINUE);
+    }
+    test_pkt->head = UPTL_HEAD_SET(UPTL_PKT_NOSEGMENT, UPTL_PKT_REQUEST, 0x04);
+    ret            = uptl_process((uint8_t *)test_pkt, pkt_len_max);
+    TEST_ASSERT_EQUAL(uptl_ext_flag, UPTL_EXT_SEG_END);
+
+    ret = uptl_send(UPTL_PKT_REQUEST, 0x04, test_send_0x01_buf, 1);
+    TEST_ASSERT_EQUAL(uptl_ext_flag, UPTL_EXT_NOSEG);
+
+    // 0x04 response test
+    test_pkt->head = UPTL_HEAD_SET(UPTL_PKT_SEGMENT, UPTL_PKT_RESPONSE, 0x04);
+    ret            = uptl_process((uint8_t *)test_pkt, pkt_len_max);
+    TEST_ASSERT_EQUAL(uptl_ext_flag, UPTL_EXT_SEG_START);
+    for (size_t i = 0; i < 5; i++) {
+        test_pkt->head =
+            UPTL_HEAD_SET(UPTL_PKT_SEGMENT, UPTL_PKT_RESPONSE, 0x04);
+        ret = uptl_process((uint8_t *)test_pkt, pkt_len_max);
+        TEST_ASSERT_EQUAL(uptl_ext_flag, UPTL_EXT_SEG_CONTINUE);
+    }
+    test_pkt->head = UPTL_HEAD_SET(UPTL_PKT_NOSEGMENT, UPTL_PKT_RESPONSE, 0x04);
+    ret            = uptl_process((uint8_t *)test_pkt, pkt_len_max);
+    TEST_ASSERT_EQUAL(uptl_ext_flag, UPTL_EXT_SEG_END);
+
+    ret = uptl_send(UPTL_PKT_RESPONSE, 0x04, test_send_0x01_buf, 1);
+    TEST_ASSERT_EQUAL(uptl_ext_flag, UPTL_EXT_NOSEG);
 }
 
 int main(void)

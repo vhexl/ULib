@@ -20,6 +20,8 @@
 bool uptl_if_send_flag    = true;
 bool uptl_if_timeout_flag = true;
 
+enum uptl_ext uptl_ext_flag = 0xFF;
+
 timeout_handler test_timeout_handle;
 
 uint8_t test_buf[TEST_BUF_SIZE] = {0x55};
@@ -40,7 +42,8 @@ double test_0x00_p6   = 2.14444444444;
 bool test_0x00_p7     = true;
 char test_0x00_p8[16] = "123456789abcdef";
 
-static int test_0x00_req(const uint8_t *data, const uint32_t len)
+static int test_0x00_req(const uint8_t *data, const uint32_t len,
+                         const enum uptl_ext ext)
 {
     // data read
     if (len == 1) {
@@ -208,7 +211,8 @@ static int test_0x00_req(const uint8_t *data, const uint32_t len)
     return UPTL_SUCCESS;
 }
 
-static int test_0x00_resp(const uint8_t *data, const uint32_t len)
+static int test_0x00_resp(const uint8_t *data, const uint32_t len,
+                          const enum uptl_ext ext)
 {
     // check
     if (len > 1) {
@@ -263,7 +267,8 @@ static int test_0x00_resp(const uint8_t *data, const uint32_t len)
     return UPTL_SUCCESS;
 }
 
-static int test_0x01_req(const uint8_t *data, const uint32_t len)
+static int test_0x01_req(const uint8_t *data, const uint32_t len,
+                         const enum uptl_ext ext)
 {
     if (test_0x01_idx + len > TEST_BUF_SIZE) {
         return UPTL_ERROR_INVAILD_PARAM;
@@ -282,7 +287,8 @@ static int test_0x01_req(const uint8_t *data, const uint32_t len)
     return UPTL_SUCCESS;
 }
 
-static int test_0x01_resp(const uint8_t *data, const uint32_t len)
+static int test_0x01_resp(const uint8_t *data, const uint32_t len,
+                          const enum uptl_ext ext)
 {
     if (len != 4) {
         return UPTL_ERROR_INTERNAL;
@@ -302,7 +308,8 @@ static int test_0x01_resp(const uint8_t *data, const uint32_t len)
     return UPTL_SUCCESS;
 }
 
-static int test_0x02_req(const uint8_t *data, const uint32_t len)
+static int test_0x02_req(const uint8_t *data, const uint32_t len,
+                         const enum uptl_ext ext)
 {
     for (size_t i = 0; i < TEST_BUF_SIZE; i++) {
         test_0x02_buf[i] = i % 256;
@@ -311,7 +318,8 @@ static int test_0x02_req(const uint8_t *data, const uint32_t len)
     return ret;
 }
 
-static int test_0x02_resp(const uint8_t *data, const uint32_t len)
+static int test_0x02_resp(const uint8_t *data, const uint32_t len,
+                          const enum uptl_ext ext)
 {
     if (test_0x01_idx + len > TEST_BUF_SIZE) {
         return UPTL_ERROR_INTERNAL;
@@ -324,6 +332,37 @@ static int test_0x02_resp(const uint8_t *data, const uint32_t len)
     }
 
     test_0x02_idx += len;
+
+    return UPTL_SUCCESS;
+}
+
+static int test_0x03_req(const uint8_t *data, const uint32_t len,
+                          const enum uptl_ext ext)
+{
+    uptl_ext_flag = ext;
+    return UPTL_SUCCESS;
+}
+
+static int test_0x03_resp(const uint8_t *data, const uint32_t len,
+                          const enum uptl_ext ext)
+{
+    uptl_ext_flag = ext;
+
+    return UPTL_SUCCESS;
+}
+
+static int test_0x04_req(const uint8_t *data, const uint32_t len,
+                          const enum uptl_ext ext)
+{
+    uptl_ext_flag = ext;
+
+    return UPTL_SUCCESS;
+}
+
+static int test_0x04_resp(const uint8_t *data, const uint32_t len,
+                          const enum uptl_ext ext)
+{
+    uptl_ext_flag = ext;
 
     return UPTL_SUCCESS;
 }
@@ -361,6 +400,22 @@ struct uptl_cmd_handler __ext_cmd_list[] = {
     {
         .head    = UPTL_HEAD_SET(UPTL_PKT_SEGMENT, UPTL_PKT_RESPONSE, 0x02),
         .handler = test_0x02_resp,
+    },
+    {
+        .head    = UPTL_HEAD_SET(UPTL_PKT_NOSEGMENT, UPTL_PKT_REQUEST, 0x03),
+        .handler = test_0x03_req,
+    },
+    {
+        .head    = UPTL_HEAD_SET(UPTL_PKT_NOSEGMENT, UPTL_PKT_RESPONSE, 0x03),
+        .handler = test_0x03_resp,
+    },
+        {
+        .head    = UPTL_HEAD_SET(UPTL_PKT_SEGMENT, UPTL_PKT_REQUEST, 0x04),
+        .handler = test_0x04_req,
+    },
+    {
+        .head    = UPTL_HEAD_SET(UPTL_PKT_SEGMENT, UPTL_PKT_RESPONSE, 0x04),
+        .handler = test_0x04_resp,
     },
     // ----------------------------
 };

@@ -79,7 +79,15 @@
 
 #define UPTL_PKT_CMD_INVAILD (0xFF)
 
-typedef int (*cmd_handler)(const uint8_t *data, const uint32_t len);
+enum uptl_ext {
+    UPTL_EXT_NOSEG,
+    UPTL_EXT_SEG_START,
+    UPTL_EXT_SEG_CONTINUE,
+    UPTL_EXT_SEG_END,
+};
+
+typedef int (*cmd_handler)(const uint8_t *data, const uint32_t len,
+                           const enum uptl_ext ext);
 
 // struct __pkt_head {
 //     uint8_t segment : 1; // 0: is end, 1: followed by data

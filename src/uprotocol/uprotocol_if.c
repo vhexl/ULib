@@ -14,10 +14,24 @@
 #include "ULib.h"
 
 // just example implement
-static uint32_t __example_cmd_handler(const uint8_t *data, const uint32_t len)
+static uint32_t __example_cmd_handler(const uint8_t *data, const uint32_t len,
+                                      const enum uptl_ext ext)
 {
     uint8_t resp[2] = {0x11, 0x22};
     uptl_send(UPTL_PKT_RESPONSE, 0x00, resp, 2);
+
+    switch (ext) {
+        case UPTL_EXT_NOSEG:
+            break;
+        case UPTL_EXT_SEG_START:
+            break;
+        case UPTL_EXT_SEG_CONTINUE:
+            break;
+        case UPTL_EXT_SEG_END:
+            break;
+        default:
+            break;
+    }
 
     return UPTL_SUCCESS;
 }
