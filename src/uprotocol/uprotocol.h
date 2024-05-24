@@ -26,7 +26,7 @@
 #define UPTL_DEBUG 0
 
 #if UPTL_DEBUG == 1
-/* Enable debug */
+//  Enable debug
 #define UPTL_PARAM_ASSERT(exp)                                                 \
     if (!(exp)) {                                                              \
         while (1)                                                              \
@@ -43,7 +43,7 @@
     } while (0)
 
 #else
-/* Disable debug */
+//  Disable debug
 #define UPTL_PARAM_ASSERT(exp)
 #define UPTL_LOGE(fmt, ...)
 #define UPTL_LOGI(fmt, ...)

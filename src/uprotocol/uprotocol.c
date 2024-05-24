@@ -107,7 +107,7 @@ int uptl_send(const enum uptl_pkt_type type, const uint8_t cmd,
     uint32_t body_size       = 0;
 
     while (len > 0) {
-        /* function recursion `__uptl_static_buf` may be modified.*/
+        //  function recursion `__uptl_static_buf` may be modified.
         if (len > UPTL_PAYLOAD_SIZE_MAX) {
             pkt->head = UPTL_HEAD_SET(UPTL_PKT_SEGMENT, type, cmd);
             body_size = UPTL_PAYLOAD_SIZE_MAX;
@@ -119,6 +119,11 @@ int uptl_send(const enum uptl_pkt_type type, const uint8_t cmd,
         }
 
         memcpy(pkt->body, data, body_size);
+
+        UPTL_LOGI("UPTL process: seg: %d, type: %d, cmd: %d, len: %d",
+                  UPTL_PKT_SEG_GET(pkt->head) ? 1 : 0,
+                  UPTL_PKT_TYPE_GET(pkt->head) ? 1 : 0,
+                  UPTL_PKT_CMD_GET(pkt->head), body_size);
 
         int ret = uptl_if_send((const uint8_t *)pkt, head_size + body_size);
         if (ret != UPTL_SUCCESS) {
@@ -153,7 +158,10 @@ int uptl_process(const uint8_t *data, uint32_t len)
     const struct uptl_pkt *pkt = (const struct uptl_pkt *)data;
     const uint32_t body_len    = len - sizeof(struct uptl_pkt);
 
-    UPTL_LOGI("Handle package: head = 0x%X", (uint8_t *)pkt);
+    UPTL_LOGI("UPTL process: seg: %d, type: %d, cmd: %d, len: %d",
+              UPTL_PKT_SEG_GET(pkt->head) ? 1 : 0,
+              UPTL_PKT_TYPE_GET(pkt->head) ? 1 : 0, UPTL_PKT_CMD_GET(pkt->head),
+              body_len);
 
     // check cache
     if (__pkt_cache.hdl != NULL) {

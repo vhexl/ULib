@@ -18,12 +18,12 @@
 
 #include "test.h"
 
-/* Is run before every test, put unit init calls here. */
+//  Is run before every test, put unit init calls here. 
 void setUp(void)
 {
 }
 
-/* Is run after every test, put unit clean-up calls here. */
+//  Is run after every test, put unit clean-up calls here. 
 void tearDown(void)
 {
 }
@@ -59,7 +59,7 @@ void test_uconfig(void)
     // ---------------------------------------------------------------------------------------
     TEST_ASSERT_EQUAL(ucfg_init(), UCFG_SUCCESS);
 
-    /* Test read all types */
+    //  Test read all types 
     TEST_ASSERT_EQUAL(ucfg_read(0, (uint8_t *)&t_f1, sizeof(t_f1)),
                       UCFG_SUCCESS);
     TEST_ASSERT_EQUAL(ucfg_read(1, (uint8_t *)&t_f2, sizeof(t_f2)),
@@ -79,7 +79,7 @@ void test_uconfig(void)
     TEST_ASSERT_EQUAL(ucfg_read(8, (uint8_t *)&t_magic, sizeof(t_magic)),
                       UCFG_SUCCESS);
 
-    /* Check all read values */
+    //  Check all read values 
     TEST_ASSERT_EQUAL_UINT32(t_f1, f1);
     TEST_ASSERT_EQUAL_UINT8(t_f2, f2);
     TEST_ASSERT_EQUAL_UINT16(t_f3, f3);
@@ -94,7 +94,7 @@ void test_uconfig(void)
     //                                      Write Test
     // ---------------------------------------------------------------------------------------
 
-    /* Test write all types */
+    //  Test write all types 
     t_f1    = true;
     t_f2    = 0x33;
     t_f3    = 0x1122;
@@ -129,7 +129,7 @@ void test_uconfig(void)
     TEST_ASSERT_EQUAL(ucfg_write(8, (uint8_t *)&t_magic, sizeof(t_magic)),
                       UCFG_SUCCESS);
 
-    /* Check all read values */
+    //  Check all read values 
     TEST_ASSERT_EQUAL_UINT32(t_f1, f1);
     TEST_ASSERT_EQUAL_UINT8(t_f2, f2);
     TEST_ASSERT_EQUAL_UINT16(t_f3, f3);
@@ -143,8 +143,8 @@ void test_uconfig(void)
     // ---------------------------------------------------------------------------------------
     //                                      Reread Test
     // ---------------------------------------------------------------------------------------
-    /* NOTO: Only last test is pass this test is pass */
-    /* Test read all types */
+    //  NOTO: Only last test is pass this test is pass 
+    //  Test read all types 
     TEST_ASSERT_EQUAL(ucfg_read(0, (uint8_t *)&t_f1, sizeof(t_f1)),
                       UCFG_SUCCESS);
     TEST_ASSERT_EQUAL(ucfg_read(1, (uint8_t *)&t_f2, sizeof(t_f2)),
@@ -164,7 +164,7 @@ void test_uconfig(void)
     TEST_ASSERT_EQUAL(ucfg_read(8, (uint8_t *)&t_magic, sizeof(t_magic)),
                       UCFG_SUCCESS);
 
-    /* Check all read values */
+    //  Check all read values 
     TEST_ASSERT_EQUAL_UINT32(t_f1, f1);
     TEST_ASSERT_EQUAL_UINT8(t_f2, f2);
     TEST_ASSERT_EQUAL_UINT16(t_f3, f3);
@@ -196,7 +196,7 @@ void test_uconfig(void)
 
     TEST_ASSERT_EQUAL(ucfg_init(), UCFG_SUCCESS);
 
-    /* Test read all types */
+    //  Test read all types 
     TEST_ASSERT_EQUAL(ucfg_read(0, (uint8_t *)&t_f1, sizeof(t_f1)),
                       UCFG_SUCCESS);
     TEST_ASSERT_EQUAL(ucfg_read(1, (uint8_t *)&t_f2, sizeof(t_f2)),
@@ -216,7 +216,7 @@ void test_uconfig(void)
     TEST_ASSERT_EQUAL(ucfg_read(8, (uint8_t *)&t_magic, sizeof(t_magic)),
                       UCFG_SUCCESS);
 
-    /* Check all read values */
+    //  Check all read values 
     TEST_ASSERT_EQUAL_UINT32(t_f1, f1);
     TEST_ASSERT_EQUAL_UINT8(t_f2, f2);
     TEST_ASSERT_EQUAL_UINT16(t_f3, f3);
@@ -232,7 +232,7 @@ void test_uconfig(void)
     // ---------------------------------------------------------------------------------------
     TEST_ASSERT_EQUAL(ucfg_restore(), UCFG_SUCCESS);
 
-    /* Test read all types */
+    //  Test read all types 
     TEST_ASSERT_EQUAL(ucfg_read(0, (uint8_t *)&t_f1, sizeof(t_f1)),
                       UCFG_SUCCESS);
     TEST_ASSERT_EQUAL(ucfg_read(1, (uint8_t *)&t_f2, sizeof(t_f2)),
@@ -252,7 +252,7 @@ void test_uconfig(void)
     TEST_ASSERT_EQUAL(ucfg_read(8, (uint8_t *)&t_magic, sizeof(t_magic)),
                       UCFG_SUCCESS);
 
-    /* Check all read values */
+    //  Check all read values 
     TEST_ASSERT_EQUAL_UINT32(t_f1, f1);
     TEST_ASSERT_EQUAL_UINT8(t_f2, f2);
     TEST_ASSERT_EQUAL_UINT16(t_f3, f3);
