@@ -19,7 +19,7 @@
 #define UCFG_DEBUG 0
 
 #if UCFG_DEBUG == 1
-//  Enable debug
+// Enable debug
 #define UCFG_PARAM_ASSERT(exp)                                                 \
     if (!(exp)) {                                                              \
         while (1)                                                              \
@@ -36,7 +36,7 @@
     } while (0)
 
 #else
-//  Disable debug
+// Disable debug
 #define UCFG_PARAM_ASSERT(exp)
 #define UCFG_LOG(fmt, ...)
 #define UCFG_FIELD_PRINT(field, val, sz)

@@ -16,8 +16,13 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#define UPTL_BUF_SIZE         512
-#define UPTL_PAYLOAD_SIZE_MAX (UPTL_BUF_SIZE - sizeof(struct uptl_pkt))
+// ------------------------------------------------------------------------
+//                           Macro definition
+// ------------------------------------------------------------------------
+
+#define UPTL_BUF_SIZE      256
+#define UPTL_HEAD_SIZE     sizeof(uptl_head_t)
+#define UPTL_BODY_SIZE_MAX (UPTL_BUF_SIZE - sizeof(uptl_head_t))
 
 #if UPTL_BUF_SIZE < 1
 #error "UPTL_BUF_SIZE must be greater than 1"
@@ -26,7 +31,7 @@
 #define UPTL_DEBUG 0
 
 #if UPTL_DEBUG == 1
-//  Enable debug
+// Enable debug
 #define UPTL_PARAM_ASSERT(exp)                                                 \
     if (!(exp)) {                                                              \
         while (1)                                                              \
@@ -43,41 +48,38 @@
     } while (0)
 
 #else
-//  Disable debug
+// Disable debug
 #define UPTL_PARAM_ASSERT(exp)
 #define UPTL_LOGE(fmt, ...)
 #define UPTL_LOGI(fmt, ...)
 #define UPTL_FIELD_PRINT(field, val, sz)
 #endif
 
-#define UPTL_PKT_SEG_MASK          0x80
-#define UPTL_PKT_TYPE_MASK         0x40
-#define UPTL_PKT_CMD_MASK          0x3F
+// segment:1, type:1, command:6
+// 0x80: segment, 0x40: type, 0x3F: command
+#define UPTL_PKT_SEG_MASK      0x80
+#define UPTL_PKT_TYPE_MASK     0x40
+#define UPTL_PKT_CMD_MASK      0x3F
 
-#define UPTL_PKT_SEG_CHANGE(h, v)  ((h) = (v | (h & (~UPTL_PKT_SEG_MASK))))
-#define UPTL_PKT_TYPE_CHANGE(h, v) ((h) = (v | (h & (~UPTL_PKT_TYPE_MASK))))
-#define UPTL_PKT_CMD_CHANGE(h, v)  ((h) = (v | (h & (~UPTL_PKT_CMD_MASK))))
+#define UPTL_PKT_SEG_SET(h)    ((h) |= UPTL_PKT_SEG_MASK)
+#define UPTL_PKT_TYPE_SET(h)   ((h) |= UPTL_PKT_TYPE_MASK)
+#define UPTL_PKT_CMD_SET(h)    ((h) |= UPTL_PKT_CMD_MASK)
 
-#define UPTL_PKT_SEG_SET(h)        ((h) |= UPTL_PKT_SEG_MASK)
-#define UPTL_PKT_TYPE_SET(h)       ((h) |= UPTL_PKT_TYPE_MASK)
-#define UPTL_PKT_CMD_SET(h)        ((h) |= UPTL_PKT_CMD_MASK)
+#define UPTL_PKT_SEG_UNSET(h)  ((h) &= ~UPTL_PKT_SEG_MASK)
+#define UPTL_PKT_TYPE_UNSET(h) ((h) &= ~UPTL_PKT_TYPE_MASK)
+#define UPTL_PKT_CMD_UNSET(h)  ((h) &= ~UPTL_PKT_CMD_MASK)
 
-#define UPTL_PKT_SEG_RESET(h)      ((h) &= ~UPTL_PKT_SEG_MASK)
-#define UPTL_PKT_TYPE_RESET(h)     ((h) &= ~UPTL_PKT_TYPE_MASK)
-#define UPTL_PKT_CMD_RESET(h)      ((h) &= ~UPTL_PKT_CMD_MASK)
-
-#define UPTL_PKT_SEG_GET(h)        ((h) & UPTL_PKT_SEG_MASK)
-#define UPTL_PKT_TYPE_GET(h)       ((h) & UPTL_PKT_TYPE_MASK)
-#define UPTL_PKT_CMD_GET(h)        ((h) & UPTL_PKT_CMD_MASK)
-
-#define UPTL_PKT_SEG_IS(h)         ((h) & UPTL_PKT_SEG_MASK)
-#define UPTL_PKT_TYPE_IS(h)        ((h) & UPTL_PKT_TYPE_MASK)
+#define UPTL_PKT_SEG_GET(h)    ((h) & UPTL_PKT_SEG_MASK)
+#define UPTL_PKT_TYPE_GET(h)   ((h) & UPTL_PKT_TYPE_MASK)
+#define UPTL_PKT_CMD_GET(h)    ((h) & UPTL_PKT_CMD_MASK)
 
 #define UPTL_HEAD_SET(seg, type, cmd)                                          \
     ((seg & UPTL_PKT_SEG_MASK) | (type & UPTL_PKT_TYPE_MASK) |                 \
      (cmd & UPTL_PKT_CMD_MASK))
 
-#define UPTL_PKT_CMD_INVAILD (0xFF)
+// ------------------------------------------------------------------------
+//                           Type definition
+// ------------------------------------------------------------------------
 
 enum uptl_ext {
     UPTL_EXT_NOSEG,
@@ -86,27 +88,23 @@ enum uptl_ext {
     UPTL_EXT_SEG_END,
 };
 
-typedef int (*cmd_handler)(const uint8_t *data, const uint32_t len,
-                           const enum uptl_ext ext);
+typedef uint8_t uptl_head_t;
 
-// struct __pkt_head {
-//     uint8_t segment : 1; // 0: is end, 1: followed by data
-//     uint8_t type : 1;    // 0: request, 1: response
-//     uint8_t cmd : 5;     // cmd code
-// };
+typedef int (*cmd_handler)(const uint8_t *data, uint32_t len,
+                           enum uptl_ext ext);
 
 struct uptl_cmd_handler {
-    uint8_t head;
+    uptl_head_t head;
     cmd_handler handler; // cmd handle function pointer
 };
 
 struct uptl_pkt {
-    uint8_t head;
-    uint8_t body[]; // params or data
+    uptl_head_t head;
+    uint8_t body[UPTL_BODY_SIZE_MAX]; // params or data
 };
 
 struct uptl_cache {
-    uint8_t head;
+    uptl_head_t head;
     cmd_handler hdl;
 };
 
@@ -134,8 +132,15 @@ enum uptl_ret {
     UPTL_ERROR_INTERNAL,
 };
 
-int uptl_send(const enum uptl_pkt_type type, const uint8_t cmd,
-              const uint8_t *data, uint32_t len);
+// ------------------------------------------------------------------------
+//                           Public Functions
+// ------------------------------------------------------------------------
+
+int uptl_req_send(uint8_t cmd, const uint8_t *data, uint32_t len);
+
+int uptl_resp_send(uint8_t cmd, const uint8_t *data, uint32_t len);
+
+int uptl_custom_send(struct uptl_pkt *pkt, uint32_t body_len);
 
 int uptl_process(const uint8_t *data, uint32_t len);
 

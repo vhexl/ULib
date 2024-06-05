@@ -40,12 +40,45 @@ static void __uptl_timeout_handler(void)
 {
     __pkt_cache.head = 0;
     __pkt_cache.hdl  = NULL;
+    UPTL_LOGE("Timeout...");
 }
 
-static int __uptl_cmd_hdl_match(const struct uptl_pkt *pkt,
-                                const uint32_t body_len)
+static int __uptl_send(enum uptl_pkt_type type, uint8_t cmd,
+                       const uint8_t *data, uint32_t len)
 {
-    const bool is_seg = (bool)UPTL_PKT_SEG_IS(pkt->head);
+    struct uptl_pkt *pkt     = (struct uptl_pkt *)__uptl_static_buf;
+    const uint32_t head_size = UPTL_HEAD_SIZE;
+    uint32_t body_size       = 0;
+
+    while (len > 0) {
+        // function recursion `__uptl_static_buf` may be modified.
+        if (len > UPTL_BODY_SIZE_MAX) {
+            pkt->head = UPTL_HEAD_SET(UPTL_PKT_SEGMENT, type, cmd);
+            body_size = UPTL_BODY_SIZE_MAX;
+            len -= UPTL_BODY_SIZE_MAX;
+        } else {
+            pkt->head = UPTL_HEAD_SET(UPTL_PKT_NOSEGMENT, type, cmd);
+            body_size = len;
+            len       = 0;
+        }
+
+        memcpy(pkt->body, data, body_size);
+
+        int ret = uptl_if_send((const uint8_t *)pkt, head_size + body_size);
+        if (ret != UPTL_SUCCESS) {
+            UPTL_LOGE("Send failed, %d bytes remaining", len);
+            return ret;
+        }
+
+        data += body_size;
+    }
+
+    return UPTL_SUCCESS;
+}
+
+static int __uptl_match(const struct uptl_pkt *pkt, uint32_t body_len)
+{
+    const bool is_seg = (bool)UPTL_PKT_SEG_GET(pkt->head);
 
     for (size_t i = 0; i < __ext_cmd_list_len; i++) {
         // match cmd code and type
@@ -56,7 +89,7 @@ static int __uptl_cmd_hdl_match(const struct uptl_pkt *pkt,
         if (!UPTL_PKT_SEG_GET(__ext_cmd_list[i].head) && is_seg) {
             return UPTL_ERROR_SEGMENT; // Unexpected segment
         } else {
-            if (is_seg && body_len != UPTL_PAYLOAD_SIZE_MAX) {
+            if (is_seg && body_len != UPTL_BODY_SIZE_MAX) {
                 return UPTL_ERROR_SEGMENT_INAILD;
             }
             if (__pkt_cache.hdl == NULL && is_seg) {
@@ -84,12 +117,8 @@ static int __uptl_cmd_hdl_match(const struct uptl_pkt *pkt,
 // ------------------------------------------------------------------------
 
 /**
- * @brief Sends an UPTL protocol package.
+ * @brief UProtocol request send
  *
- * This function sends an UPTL protocol package with the given package type,
- * command, and data. The length of the data determines the size of the body.
- *
- * @param type The package type.
  * @param cmd The command for the package.
  * @param data The data to be sent.
  * @param len The length of the data.
@@ -98,43 +127,43 @@ static int __uptl_cmd_hdl_match(const struct uptl_pkt *pkt,
  *
  * @retval UPTL_SUCCESS: Send success
  */
-int uptl_send(const enum uptl_pkt_type type, const uint8_t cmd,
-              const uint8_t *data, uint32_t len)
+inline int uptl_req_send(uint8_t cmd, const uint8_t *data, uint32_t len)
 {
     UPTL_PARAM_ASSERT(data != NULL && len > 0 || len == 0);
-    struct uptl_pkt *pkt     = (struct uptl_pkt *)__uptl_static_buf;
-    const uint32_t head_size = sizeof(struct uptl_pkt);
-    uint32_t body_size       = 0;
+    return __uptl_send(UPTL_PKT_REQUEST, cmd, data, len);
+}
 
-    while (len > 0) {
-        //  function recursion `__uptl_static_buf` may be modified.
-        if (len > UPTL_PAYLOAD_SIZE_MAX) {
-            pkt->head = UPTL_HEAD_SET(UPTL_PKT_SEGMENT, type, cmd);
-            body_size = UPTL_PAYLOAD_SIZE_MAX;
-            len -= UPTL_PAYLOAD_SIZE_MAX;
-        } else {
-            pkt->head = UPTL_HEAD_SET(UPTL_PKT_NOSEGMENT, type, cmd);
-            body_size = len;
-            len       = 0;
-        }
+/**
+ * @brief UProtocol request send
+ *
+ * @param cmd The command for the package.
+ * @param data The data to be sent.
+ * @param len The length of the data.
+ *
+ * @return int uprotocol error code.
+ *
+ * @retval UPTL_SUCCESS: Send success
+ */
+inline int uptl_resp_send(uint8_t cmd, const uint8_t *data, uint32_t len)
+{
+    UPTL_PARAM_ASSERT(data != NULL && len > 0 || len == 0);
+    return __uptl_send(UPTL_PKT_RESPONSE, cmd, data, len);
+}
 
-        memcpy(pkt->body, data, body_size);
-
-        UPTL_LOGI("UPTL process: seg: %d, type: %d, cmd: %d, len: %d",
-                  UPTL_PKT_SEG_GET(pkt->head) ? 1 : 0,
-                  UPTL_PKT_TYPE_GET(pkt->head) ? 1 : 0,
-                  UPTL_PKT_CMD_GET(pkt->head), body_size);
-
-        int ret = uptl_if_send((const uint8_t *)pkt, head_size + body_size);
-        if (ret != UPTL_SUCCESS) {
-            UPTL_LOGE("Send failed, %d bytes remaining", len);
-            return ret;
-        }
-
-        data += body_size;
-    }
-
-    return UPTL_SUCCESS;
+/**
+ * @brief UProtocol request send
+ *
+ * @param pkt The pkt to be sent.
+ * @param len The length of the data.
+ *
+ * @return int uprotocol error code.
+ *
+ * @retval UPTL_SUCCESS: Send success
+ */
+inline int uptl_custom_send(struct uptl_pkt *pkt, uint32_t body_len)
+{
+    UPTL_PARAM_ASSERT(pkt != NULL);
+    return uptl_if_send((const uint8_t *)pkt, body_len);
 }
 
 /**
@@ -156,12 +185,7 @@ int uptl_process(const uint8_t *data, uint32_t len)
     UPTL_PARAM_ASSERT(data != NULL && len > 0);
 
     const struct uptl_pkt *pkt = (const struct uptl_pkt *)data;
-    const uint32_t body_len    = len - sizeof(struct uptl_pkt);
-
-    UPTL_LOGI("UPTL process: seg: %d, type: %d, cmd: %d, len: %d",
-              UPTL_PKT_SEG_GET(pkt->head) ? 1 : 0,
-              UPTL_PKT_TYPE_GET(pkt->head) ? 1 : 0, UPTL_PKT_CMD_GET(pkt->head),
-              body_len);
+    const uint32_t body_len    = len - UPTL_HEAD_SIZE;
 
     // check cache
     if (__pkt_cache.hdl != NULL) {
@@ -183,5 +207,5 @@ int uptl_process(const uint8_t *data, uint32_t len)
         }
     }
 
-    return __uptl_cmd_hdl_match(pkt, body_len);
+    return __uptl_match(pkt, body_len);
 }

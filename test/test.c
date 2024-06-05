@@ -18,12 +18,12 @@
 
 #include "test.h"
 
-//  Is run before every test, put unit init calls here. 
+// Is run before every test, put unit init calls here.
 void setUp(void)
 {
 }
 
-//  Is run after every test, put unit clean-up calls here. 
+// Is run after every test, put unit clean-up calls here.
 void tearDown(void)
 {
 }
@@ -59,7 +59,7 @@ void test_uconfig(void)
     // ---------------------------------------------------------------------------------------
     TEST_ASSERT_EQUAL(ucfg_init(), UCFG_SUCCESS);
 
-    //  Test read all types 
+    // Test read all types
     TEST_ASSERT_EQUAL(ucfg_read(0, (uint8_t *)&t_f1, sizeof(t_f1)),
                       UCFG_SUCCESS);
     TEST_ASSERT_EQUAL(ucfg_read(1, (uint8_t *)&t_f2, sizeof(t_f2)),
@@ -79,7 +79,7 @@ void test_uconfig(void)
     TEST_ASSERT_EQUAL(ucfg_read(8, (uint8_t *)&t_magic, sizeof(t_magic)),
                       UCFG_SUCCESS);
 
-    //  Check all read values 
+    // Check all read values
     TEST_ASSERT_EQUAL_UINT32(t_f1, f1);
     TEST_ASSERT_EQUAL_UINT8(t_f2, f2);
     TEST_ASSERT_EQUAL_UINT16(t_f3, f3);
@@ -94,7 +94,7 @@ void test_uconfig(void)
     //                                      Write Test
     // ---------------------------------------------------------------------------------------
 
-    //  Test write all types 
+    // Test write all types
     t_f1    = true;
     t_f2    = 0x33;
     t_f3    = 0x1122;
@@ -129,7 +129,7 @@ void test_uconfig(void)
     TEST_ASSERT_EQUAL(ucfg_write(8, (uint8_t *)&t_magic, sizeof(t_magic)),
                       UCFG_SUCCESS);
 
-    //  Check all read values 
+    // Check all read values
     TEST_ASSERT_EQUAL_UINT32(t_f1, f1);
     TEST_ASSERT_EQUAL_UINT8(t_f2, f2);
     TEST_ASSERT_EQUAL_UINT16(t_f3, f3);
@@ -143,8 +143,8 @@ void test_uconfig(void)
     // ---------------------------------------------------------------------------------------
     //                                      Reread Test
     // ---------------------------------------------------------------------------------------
-    //  NOTO: Only last test is pass this test is pass 
-    //  Test read all types 
+    // NOTO: Only last test is pass this test is pass
+    // Test read all types
     TEST_ASSERT_EQUAL(ucfg_read(0, (uint8_t *)&t_f1, sizeof(t_f1)),
                       UCFG_SUCCESS);
     TEST_ASSERT_EQUAL(ucfg_read(1, (uint8_t *)&t_f2, sizeof(t_f2)),
@@ -164,7 +164,7 @@ void test_uconfig(void)
     TEST_ASSERT_EQUAL(ucfg_read(8, (uint8_t *)&t_magic, sizeof(t_magic)),
                       UCFG_SUCCESS);
 
-    //  Check all read values 
+    // Check all read values
     TEST_ASSERT_EQUAL_UINT32(t_f1, f1);
     TEST_ASSERT_EQUAL_UINT8(t_f2, f2);
     TEST_ASSERT_EQUAL_UINT16(t_f3, f3);
@@ -196,7 +196,7 @@ void test_uconfig(void)
 
     TEST_ASSERT_EQUAL(ucfg_init(), UCFG_SUCCESS);
 
-    //  Test read all types 
+    // Test read all types
     TEST_ASSERT_EQUAL(ucfg_read(0, (uint8_t *)&t_f1, sizeof(t_f1)),
                       UCFG_SUCCESS);
     TEST_ASSERT_EQUAL(ucfg_read(1, (uint8_t *)&t_f2, sizeof(t_f2)),
@@ -216,7 +216,7 @@ void test_uconfig(void)
     TEST_ASSERT_EQUAL(ucfg_read(8, (uint8_t *)&t_magic, sizeof(t_magic)),
                       UCFG_SUCCESS);
 
-    //  Check all read values 
+    // Check all read values
     TEST_ASSERT_EQUAL_UINT32(t_f1, f1);
     TEST_ASSERT_EQUAL_UINT8(t_f2, f2);
     TEST_ASSERT_EQUAL_UINT16(t_f3, f3);
@@ -232,7 +232,7 @@ void test_uconfig(void)
     // ---------------------------------------------------------------------------------------
     TEST_ASSERT_EQUAL(ucfg_restore(), UCFG_SUCCESS);
 
-    //  Test read all types 
+    // Test read all types
     TEST_ASSERT_EQUAL(ucfg_read(0, (uint8_t *)&t_f1, sizeof(t_f1)),
                       UCFG_SUCCESS);
     TEST_ASSERT_EQUAL(ucfg_read(1, (uint8_t *)&t_f2, sizeof(t_f2)),
@@ -252,7 +252,7 @@ void test_uconfig(void)
     TEST_ASSERT_EQUAL(ucfg_read(8, (uint8_t *)&t_magic, sizeof(t_magic)),
                       UCFG_SUCCESS);
 
-    //  Check all read values 
+    // Check all read values
     TEST_ASSERT_EQUAL_UINT32(t_f1, f1);
     TEST_ASSERT_EQUAL_UINT8(t_f2, f2);
     TEST_ASSERT_EQUAL_UINT16(t_f3, f3);
@@ -325,60 +325,60 @@ void test_uprotocol(void)
     // test 0x00 read
     for (size_t i = 1; i < 9; i++) {
         test_0x00_tmpl[0] = i % 256;
-        ret = uptl_send(UPTL_PKT_REQUEST, 0x00, test_0x00_tmpl, 1);
+        ret               = uptl_req_send(0x00, test_0x00_tmpl, 1);
         TEST_ASSERT_EQUAL(ret, UPTL_SUCCESS);
     }
 
     // test 0x00 write
     test_0x00_tmpl[0] = 1;
     memcpy(test_0x00_tmpl + 1, &test_0x00_p1, 1);
-    ret = uptl_send(UPTL_PKT_REQUEST, 0x00, test_0x00_tmpl, 2);
+    ret = uptl_req_send(0x00, test_0x00_tmpl, 2);
     TEST_ASSERT_EQUAL(ret, UPTL_SUCCESS);
 
     test_0x00_tmpl[0] = 2;
     memcpy(test_0x00_tmpl + 1, &test_0x00_p2, 2);
-    ret = uptl_send(UPTL_PKT_REQUEST, 0x00, test_0x00_tmpl, 3);
+    ret = uptl_req_send(0x00, test_0x00_tmpl, 3);
     TEST_ASSERT_EQUAL(ret, UPTL_SUCCESS);
 
     test_0x00_tmpl[0] = 3;
     memcpy(test_0x00_tmpl + 1, &test_0x00_p3, 4);
-    ret = uptl_send(UPTL_PKT_REQUEST, 0x00, test_0x00_tmpl, 5);
+    ret = uptl_req_send(0x00, test_0x00_tmpl, 5);
     TEST_ASSERT_EQUAL(ret, UPTL_SUCCESS);
 
     test_0x00_tmpl[0] = 4;
     memcpy(test_0x00_tmpl + 1, &test_0x00_p4, 8);
-    ret = uptl_send(UPTL_PKT_REQUEST, 0x00, test_0x00_tmpl, 9);
+    ret = uptl_req_send(0x00, test_0x00_tmpl, 9);
     TEST_ASSERT_EQUAL(ret, UPTL_SUCCESS);
 
     test_0x00_tmpl[0] = 5;
     memcpy(test_0x00_tmpl + 1, &test_0x00_p5, 4);
-    ret = uptl_send(UPTL_PKT_REQUEST, 0x00, test_0x00_tmpl, 5);
+    ret = uptl_req_send(0x00, test_0x00_tmpl, 5);
     TEST_ASSERT_EQUAL(ret, UPTL_SUCCESS);
 
     test_0x00_tmpl[0] = 6;
     memcpy(test_0x00_tmpl + 1, &test_0x00_p6, 8);
-    ret = uptl_send(UPTL_PKT_REQUEST, 0x00, test_0x00_tmpl, 9);
+    ret = uptl_req_send(0x00, test_0x00_tmpl, 9);
     TEST_ASSERT_EQUAL(ret, UPTL_SUCCESS);
 
     test_0x00_tmpl[0] = 7;
     memcpy(test_0x00_tmpl + 1, &test_0x00_p7, sizeof(bool));
-    ret = uptl_send(UPTL_PKT_REQUEST, 0x00, test_0x00_tmpl, sizeof(bool));
+    ret = uptl_req_send(0x00, test_0x00_tmpl, sizeof(bool));
     TEST_ASSERT_EQUAL(ret, UPTL_SUCCESS);
 
     test_0x00_tmpl[0] = 8;
     memcpy(test_0x00_tmpl + 1, test_0x00_p8, 16);
-    ret = uptl_send(UPTL_PKT_REQUEST, 0x00, test_0x00_tmpl, 17);
+    ret = uptl_req_send(0x00, test_0x00_tmpl, 17);
     TEST_ASSERT_EQUAL(ret, UPTL_SUCCESS);
 
     // test 0x01
     for (size_t i = 0; i < TEST_BUF_SIZE; i++) {
         test_send_0x01_buf[i] = 255 - (i % 256);
     }
-    ret = uptl_send(UPTL_PKT_REQUEST, 0x01, test_send_0x01_buf, TEST_BUF_SIZE);
+    ret = uptl_req_send(0x01, test_send_0x01_buf, TEST_BUF_SIZE);
     TEST_ASSERT_EQUAL(ret, UPTL_SUCCESS);
 
     // test 0x02
-    ret = uptl_send(UPTL_PKT_REQUEST, 0x02, NULL, 0);
+    ret = uptl_req_send(0x02, NULL, 0);
     TEST_ASSERT_EQUAL(ret, UPTL_SUCCESS);
 
     for (size_t i = 0; i < TEST_BUF_SIZE; i++) {
@@ -394,67 +394,67 @@ void test_uprotocol(void)
     test_0x02_idx = 0;
 
     // failed test
-    size_t pkt_len_max = sizeof(struct uptl_pkt) + UPTL_PAYLOAD_SIZE_MAX;
+    size_t pkt_len_max = UPTL_HEAD_SIZE + UPTL_BODY_SIZE_MAX;
     // segment test
     struct uptl_pkt *test_pkt = (struct uptl_pkt *)(test_send_0x01_buf);
 
-    ret = uptl_send(UPTL_PKT_REQUEST, 0x09, test_0x00_tmpl, 1);
+    ret = uptl_req_send(0x09, test_0x00_tmpl, 1);
     TEST_ASSERT_EQUAL(ret, UPTL_ERROR_NOT_FOUND);
 
     uptl_if_send_flag = false; // set failed retrun
-    ret               = uptl_send(UPTL_PKT_REQUEST, 0x09, test_0x00_tmpl, 1);
+    ret               = uptl_req_send(0x09, test_0x00_tmpl, 1);
     TEST_ASSERT_EQUAL(ret, UPTL_ERROR_SEND_FAILED);
     uptl_if_send_flag = true; // set success retrun
 
     test_pkt->head = UPTL_HEAD_SET(UPTL_PKT_SEGMENT, UPTL_PKT_REQUEST, 0x00);
-    ret            = uptl_process((uint8_t *)test_pkt, 256);
+    ret            = uptl_custom_send(test_pkt, UPTL_BODY_SIZE_MAX / 2);
     TEST_ASSERT_EQUAL(ret, UPTL_ERROR_SEGMENT);
 
     test_pkt->head = UPTL_HEAD_SET(UPTL_PKT_SEGMENT, UPTL_PKT_REQUEST, 0x01);
-    ret            = uptl_process((uint8_t *)test_pkt, 256);
+    ret            = uptl_custom_send(test_pkt, UPTL_BODY_SIZE_MAX / 2);
     TEST_ASSERT_EQUAL(ret, UPTL_ERROR_SEGMENT_INAILD);
 
     // use uptl cache test
     for (size_t i = 0; i < 5; i++) {
         test_pkt->head =
             UPTL_HEAD_SET(UPTL_PKT_SEGMENT, UPTL_PKT_REQUEST, 0x01);
-        ret = uptl_process((uint8_t *)test_pkt, pkt_len_max);
+        ret = uptl_custom_send(test_pkt, pkt_len_max);
         TEST_ASSERT_EQUAL(ret, UPTL_SUCCESS);
     }
     test_pkt->head = UPTL_HEAD_SET(UPTL_PKT_SEGMENT, UPTL_PKT_REQUEST, 0x01);
-    ret            = uptl_process((uint8_t *)test_pkt, 256);
+    ret            = uptl_custom_send(test_pkt, UPTL_BODY_SIZE_MAX / 2);
     TEST_ASSERT_EQUAL(ret, UPTL_ERROR_SEGMENT_END);
     for (size_t i = 0; i < 5; i++) {
         test_pkt->head =
             UPTL_HEAD_SET(UPTL_PKT_SEGMENT, UPTL_PKT_REQUEST, 0x01);
-        ret = uptl_process((uint8_t *)test_pkt, pkt_len_max);
+        ret = uptl_custom_send(test_pkt, pkt_len_max);
         TEST_ASSERT_EQUAL(ret, UPTL_SUCCESS);
     }
     test_pkt->head = UPTL_HEAD_SET(UPTL_PKT_NOSEGMENT, UPTL_PKT_REQUEST, 0x01);
-    ret            = uptl_process((uint8_t *)test_pkt, 256);
+    ret            = uptl_custom_send(test_pkt, UPTL_BODY_SIZE_MAX / 2);
     TEST_ASSERT_EQUAL(ret, UPTL_ERROR_INTERNAL);
 
     test_pkt->head = UPTL_HEAD_SET(UPTL_PKT_SEGMENT, UPTL_PKT_REQUEST, 0x01);
     uptl_if_timeout_flag = false; // set failed retrun
-    ret                  = uptl_process((uint8_t *)test_pkt, pkt_len_max);
+    ret                  = uptl_custom_send(test_pkt, pkt_len_max);
     TEST_ASSERT_EQUAL(ret, UPTL_ERROR_TIMER_START);
 
     uptl_if_timeout_flag = true; // set success return
     for (size_t i = 0; i < 5; i++) {
         test_pkt->head =
             UPTL_HEAD_SET(UPTL_PKT_SEGMENT, UPTL_PKT_REQUEST, 0x01);
-        ret = uptl_process((uint8_t *)test_pkt, pkt_len_max);
+        ret = uptl_custom_send(test_pkt, pkt_len_max);
         TEST_ASSERT_EQUAL(ret, UPTL_SUCCESS);
     }
     test_pkt->head = UPTL_HEAD_SET(UPTL_PKT_SEGMENT, UPTL_PKT_REQUEST, 0x02);
-    ret            = uptl_process((uint8_t *)test_pkt, 256);
+    ret            = uptl_custom_send(test_pkt, UPTL_BODY_SIZE_MAX / 2);
     TEST_ASSERT_EQUAL(ret, UPTL_ERROR_SEGMENT_END);
 
     test_0x01_idx = 0;
     for (size_t i = 0; i < 5; i++) {
         test_pkt->head =
             UPTL_HEAD_SET(UPTL_PKT_SEGMENT, UPTL_PKT_REQUEST, 0x01);
-        ret = uptl_process((uint8_t *)test_pkt, pkt_len_max);
+        ret = uptl_custom_send(test_pkt, pkt_len_max);
         TEST_ASSERT_EQUAL(ret, UPTL_SUCCESS);
     }
     test_timeout_handle(); // call timeout handle
@@ -462,13 +462,13 @@ void test_uprotocol(void)
     for (size_t i = 0; i < 5; i++) {
         test_pkt->head =
             UPTL_HEAD_SET(UPTL_PKT_SEGMENT, UPTL_PKT_REQUEST, 0x01);
-        ret = uptl_process((uint8_t *)test_pkt, pkt_len_max);
+        ret = uptl_custom_send(test_pkt, pkt_len_max);
         TEST_ASSERT_EQUAL(ret, UPTL_SUCCESS);
     }
 
     test_0x01_idx = 0;
     memset(test_send_0x01_buf, 0, TEST_BUF_SIZE);
-    ret = uptl_send(UPTL_PKT_REQUEST, 0x01, test_send_0x01_buf, TEST_BUF_SIZE);
+    ret = uptl_req_send(0x01, test_send_0x01_buf, TEST_BUF_SIZE);
     TEST_ASSERT_EQUAL(ret, UPTL_ERROR_INTERNAL);
 
     // ---------------------------------------------------------------------------------------
@@ -479,60 +479,60 @@ void test_uprotocol(void)
     // test 0x00 read
     for (size_t i = 1; i < 9; i++) {
         test_0x00_tmpl[0] = i % 256;
-        ret = uptl_send(UPTL_PKT_REQUEST, 0x00, test_0x00_tmpl, 1);
+        ret               = uptl_req_send(0x00, test_0x00_tmpl, 1);
         TEST_ASSERT_EQUAL(ret, UPTL_SUCCESS);
     }
 
     // test 0x00 write
     test_0x00_tmpl[0] = 1;
     memcpy(test_0x00_tmpl + 1, &test_0x00_p1, 1);
-    ret = uptl_send(UPTL_PKT_REQUEST, 0x00, test_0x00_tmpl, 2);
+    ret = uptl_req_send(0x00, test_0x00_tmpl, 2);
     TEST_ASSERT_EQUAL(ret, UPTL_SUCCESS);
 
     test_0x00_tmpl[0] = 2;
     memcpy(test_0x00_tmpl + 1, &test_0x00_p2, 2);
-    ret = uptl_send(UPTL_PKT_REQUEST, 0x00, test_0x00_tmpl, 3);
+    ret = uptl_req_send(0x00, test_0x00_tmpl, 3);
     TEST_ASSERT_EQUAL(ret, UPTL_SUCCESS);
 
     test_0x00_tmpl[0] = 3;
     memcpy(test_0x00_tmpl + 1, &test_0x00_p3, 4);
-    ret = uptl_send(UPTL_PKT_REQUEST, 0x00, test_0x00_tmpl, 5);
+    ret = uptl_req_send(0x00, test_0x00_tmpl, 5);
     TEST_ASSERT_EQUAL(ret, UPTL_SUCCESS);
 
     test_0x00_tmpl[0] = 4;
     memcpy(test_0x00_tmpl + 1, &test_0x00_p4, 8);
-    ret = uptl_send(UPTL_PKT_REQUEST, 0x00, test_0x00_tmpl, 9);
+    ret = uptl_req_send(0x00, test_0x00_tmpl, 9);
     TEST_ASSERT_EQUAL(ret, UPTL_SUCCESS);
 
     test_0x00_tmpl[0] = 5;
     memcpy(test_0x00_tmpl + 1, &test_0x00_p5, 4);
-    ret = uptl_send(UPTL_PKT_REQUEST, 0x00, test_0x00_tmpl, 5);
+    ret = uptl_req_send(0x00, test_0x00_tmpl, 5);
     TEST_ASSERT_EQUAL(ret, UPTL_SUCCESS);
 
     test_0x00_tmpl[0] = 6;
     memcpy(test_0x00_tmpl + 1, &test_0x00_p6, 8);
-    ret = uptl_send(UPTL_PKT_REQUEST, 0x00, test_0x00_tmpl, 9);
+    ret = uptl_req_send(0x00, test_0x00_tmpl, 9);
     TEST_ASSERT_EQUAL(ret, UPTL_SUCCESS);
 
     test_0x00_tmpl[0] = 7;
     memcpy(test_0x00_tmpl + 1, &test_0x00_p7, sizeof(bool));
-    ret = uptl_send(UPTL_PKT_REQUEST, 0x00, test_0x00_tmpl, sizeof(bool));
+    ret = uptl_req_send(0x00, test_0x00_tmpl, sizeof(bool));
     TEST_ASSERT_EQUAL(ret, UPTL_SUCCESS);
 
     test_0x00_tmpl[0] = 8;
     memcpy(test_0x00_tmpl + 1, test_0x00_p8, 16);
-    ret = uptl_send(UPTL_PKT_REQUEST, 0x00, test_0x00_tmpl, 17);
+    ret = uptl_req_send(0x00, test_0x00_tmpl, 17);
     TEST_ASSERT_EQUAL(ret, UPTL_SUCCESS);
 
     // test 0x01
     for (size_t i = 0; i < TEST_BUF_SIZE; i++) {
         test_send_0x01_buf[i] = 255 - (i % 256);
     }
-    ret = uptl_send(UPTL_PKT_REQUEST, 0x01, test_send_0x01_buf, TEST_BUF_SIZE);
+    ret = uptl_req_send(0x01, test_send_0x01_buf, TEST_BUF_SIZE);
     TEST_ASSERT_EQUAL(ret, UPTL_SUCCESS);
 
     // test 0x02
-    ret = uptl_send(UPTL_PKT_REQUEST, 0x02, NULL, 0);
+    ret = uptl_req_send(0x02, NULL, 0);
     TEST_ASSERT_EQUAL(ret, UPTL_SUCCESS);
 
     for (size_t i = 0; i < TEST_BUF_SIZE; i++) {
@@ -545,44 +545,44 @@ void test_uprotocol(void)
     //                                Extra test
     // ---------------------------------------------------------------------------------------
     // 0x03 request test
-    ret = uptl_send(UPTL_PKT_REQUEST, 0x03, test_send_0x01_buf, 1);
+    ret = uptl_req_send(0x03, test_send_0x01_buf, 1);
     TEST_ASSERT_EQUAL(uptl_ext_flag, UPTL_EXT_NOSEG);
     // 0x03 response test
-    ret = uptl_send(UPTL_PKT_RESPONSE, 0x03, test_send_0x01_buf, 1);
+    ret = uptl_resp_send(0x03, test_send_0x01_buf, 1);
     TEST_ASSERT_EQUAL(uptl_ext_flag, UPTL_EXT_NOSEG);
 
     // 0x04 request test
     test_pkt->head = UPTL_HEAD_SET(UPTL_PKT_SEGMENT, UPTL_PKT_REQUEST, 0x04);
-    ret            = uptl_process((uint8_t *)test_pkt, pkt_len_max);
+    ret            = uptl_custom_send(test_pkt, pkt_len_max);
     TEST_ASSERT_EQUAL(uptl_ext_flag, UPTL_EXT_SEG_START);
     for (size_t i = 0; i < 5; i++) {
         test_pkt->head =
             UPTL_HEAD_SET(UPTL_PKT_SEGMENT, UPTL_PKT_REQUEST, 0x04);
-        ret = uptl_process((uint8_t *)test_pkt, pkt_len_max);
+        ret = uptl_custom_send(test_pkt, pkt_len_max);
         TEST_ASSERT_EQUAL(uptl_ext_flag, UPTL_EXT_SEG_CONTINUE);
     }
     test_pkt->head = UPTL_HEAD_SET(UPTL_PKT_NOSEGMENT, UPTL_PKT_REQUEST, 0x04);
-    ret            = uptl_process((uint8_t *)test_pkt, pkt_len_max);
+    ret            = uptl_custom_send(test_pkt, pkt_len_max);
     TEST_ASSERT_EQUAL(uptl_ext_flag, UPTL_EXT_SEG_END);
 
-    ret = uptl_send(UPTL_PKT_REQUEST, 0x04, test_send_0x01_buf, 1);
+    ret = uptl_req_send(0x04, test_send_0x01_buf, 1);
     TEST_ASSERT_EQUAL(uptl_ext_flag, UPTL_EXT_NOSEG);
 
     // 0x04 response test
     test_pkt->head = UPTL_HEAD_SET(UPTL_PKT_SEGMENT, UPTL_PKT_RESPONSE, 0x04);
-    ret            = uptl_process((uint8_t *)test_pkt, pkt_len_max);
+    ret            = uptl_custom_send(test_pkt, pkt_len_max);
     TEST_ASSERT_EQUAL(uptl_ext_flag, UPTL_EXT_SEG_START);
     for (size_t i = 0; i < 5; i++) {
         test_pkt->head =
             UPTL_HEAD_SET(UPTL_PKT_SEGMENT, UPTL_PKT_RESPONSE, 0x04);
-        ret = uptl_process((uint8_t *)test_pkt, pkt_len_max);
+        ret = uptl_custom_send(test_pkt, pkt_len_max);
         TEST_ASSERT_EQUAL(uptl_ext_flag, UPTL_EXT_SEG_CONTINUE);
     }
     test_pkt->head = UPTL_HEAD_SET(UPTL_PKT_NOSEGMENT, UPTL_PKT_RESPONSE, 0x04);
-    ret            = uptl_process((uint8_t *)test_pkt, pkt_len_max);
+    ret            = uptl_custom_send(test_pkt, pkt_len_max);
     TEST_ASSERT_EQUAL(uptl_ext_flag, UPTL_EXT_SEG_END);
 
-    ret = uptl_send(UPTL_PKT_RESPONSE, 0x04, test_send_0x01_buf, 1);
+    ret = uptl_resp_send(0x04, test_send_0x01_buf, 1);
     TEST_ASSERT_EQUAL(uptl_ext_flag, UPTL_EXT_NOSEG);
 }
 

@@ -53,42 +53,42 @@ static int test_0x00_req(const uint8_t *data, const uint32_t len,
                 uint8_t resp[2];
                 resp[0] = 1;
                 memcpy(resp + 1, &test_0x00_p1, 1);
-                int ret = uptl_send(UPTL_PKT_RESPONSE, 0x00, resp, 2);
+                int ret = uptl_resp_send(0x00, resp, 2);
                 return ret;
             }
             case 2: {
                 uint8_t resp[3];
                 resp[0] = 2;
                 memcpy(resp + 1, &test_0x00_p2, 2);
-                int ret = uptl_send(UPTL_PKT_RESPONSE, 0x00, resp, 3);
+                int ret = uptl_resp_send(0x00, resp, 3);
                 return ret;
             }
             case 3: {
                 uint8_t resp[5];
                 resp[0] = 3;
                 memcpy(resp + 1, &test_0x00_p3, 4);
-                int ret = uptl_send(UPTL_PKT_RESPONSE, 0x00, resp, 5);
+                int ret = uptl_resp_send(0x00, resp, 5);
                 return ret;
             }
             case 4: {
                 uint8_t resp[9];
                 resp[0] = 4;
                 memcpy(resp + 1, &test_0x00_p4, 8);
-                int ret = uptl_send(UPTL_PKT_RESPONSE, 0x00, resp, 9);
+                int ret = uptl_resp_send(0x00, resp, 9);
                 return ret;
             }
             case 5: {
                 uint8_t resp[5];
                 resp[0] = 5;
                 memcpy(resp + 1, &test_0x00_p5, 4);
-                int ret = uptl_send(UPTL_PKT_RESPONSE, 0x00, resp, 5);
+                int ret = uptl_resp_send(0x00, resp, 5);
                 return ret;
             }
             case 6: {
                 uint8_t resp[9];
                 resp[0] = 6;
                 memcpy(resp + 1, &test_0x00_p6, 8);
-                int ret = uptl_send(UPTL_PKT_RESPONSE, 0x00, resp, 9);
+                int ret = uptl_resp_send(0x00, resp, 9);
                 return ret;
             }
             case 7: {
@@ -96,14 +96,14 @@ static int test_0x00_req(const uint8_t *data, const uint32_t len,
                 resp[0] = 7;
                 memcpy(resp + 1, &test_0x00_p7, sizeof(bool));
                 int ret =
-                    uptl_send(UPTL_PKT_RESPONSE, 0x00, resp, sizeof(bool) + 1);
+                    uptl_resp_send(0x00, resp, sizeof(bool) + 1);
                 return ret;
             }
             case 8: {
                 uint8_t resp[17];
                 resp[0] = 8;
                 memcpy(resp + 1, &test_0x00_p8, 16);
-                int ret = uptl_send(UPTL_PKT_RESPONSE, 0x00, resp, 17);
+                int ret = uptl_resp_send(0x00, resp, 17);
                 return ret;
             }
             default:
@@ -120,7 +120,7 @@ static int test_0x00_req(const uint8_t *data, const uint32_t len,
                 uint8_t resp[2];
                 resp[0] = 1;
                 memcpy(resp + 1, &test_0x00_p1, 1);
-                int ret = uptl_send(UPTL_PKT_RESPONSE, 0x00, resp, 2);
+                int ret = uptl_resp_send(0x00, resp, 2);
                 return ret;
             }
             case 2: {
@@ -131,7 +131,7 @@ static int test_0x00_req(const uint8_t *data, const uint32_t len,
                 uint8_t resp[3];
                 resp[0] = 2;
                 memcpy(resp + 1, &test_0x00_p2, 2);
-                int ret = uptl_send(UPTL_PKT_RESPONSE, 0x00, resp, 3);
+                int ret = uptl_resp_send(0x00, resp, 3);
                 return ret;
             }
             case 3: {
@@ -142,7 +142,7 @@ static int test_0x00_req(const uint8_t *data, const uint32_t len,
                 uint8_t resp[5];
                 resp[0] = 3;
                 memcpy(resp + 1, &test_0x00_p3, 4);
-                int ret = uptl_send(UPTL_PKT_RESPONSE, 0x00, resp, 5);
+                int ret = uptl_resp_send(0x00, resp, 5);
                 return ret;
             }
             case 4: {
@@ -153,7 +153,7 @@ static int test_0x00_req(const uint8_t *data, const uint32_t len,
                 uint8_t resp[9];
                 resp[0] = 4;
                 memcpy(resp + 1, &test_0x00_p4, 8);
-                int ret = uptl_send(UPTL_PKT_RESPONSE, 0x00, resp, 9);
+                int ret = uptl_resp_send(0x00, resp, 9);
                 return ret;
             }
             case 5: {
@@ -164,7 +164,7 @@ static int test_0x00_req(const uint8_t *data, const uint32_t len,
                 uint8_t resp[5];
                 resp[0] = 5;
                 memcpy(resp + 1, &test_0x00_p5, 4);
-                int ret = uptl_send(UPTL_PKT_RESPONSE, 0x00, resp, 5);
+                int ret = uptl_resp_send(0x00, resp, 5);
                 return ret;
             }
             case 6: {
@@ -175,7 +175,7 @@ static int test_0x00_req(const uint8_t *data, const uint32_t len,
                 uint8_t resp[9];
                 resp[0] = 6;
                 memcpy(resp + 1, &test_0x00_p6, 8);
-                int ret = uptl_send(UPTL_PKT_RESPONSE, 0x00, resp, 9);
+                int ret = uptl_resp_send(0x00, resp, 9);
                 return ret;
             }
             case 7: {
@@ -187,7 +187,7 @@ static int test_0x00_req(const uint8_t *data, const uint32_t len,
                 resp[0] = 7;
                 memcpy(resp + 1, &test_0x00_p7, sizeof(bool));
                 int ret =
-                    uptl_send(UPTL_PKT_RESPONSE, 0x00, resp, sizeof(bool) + 1);
+                    uptl_resp_send(0x00, resp, sizeof(bool) + 1);
                 return ret;
             }
             case 8: {
@@ -198,7 +198,7 @@ static int test_0x00_req(const uint8_t *data, const uint32_t len,
                 uint8_t resp[17];
                 resp[0] = 8;
                 memcpy(resp + 1, &test_0x00_p8, 16);
-                int ret = uptl_send(UPTL_PKT_RESPONSE, 0x00, resp, 17);
+                int ret = uptl_resp_send(0x00, resp, 17);
                 return ret;
             }
             default:
@@ -278,9 +278,9 @@ static int test_0x01_req(const uint8_t *data, const uint32_t len,
     memcpy(test_0x01_buf + test_0x01_idx, data, len);
     test_0x01_idx += len;
 
-    if (len < UPTL_PAYLOAD_SIZE_MAX) {
+    if (len < UPTL_BODY_SIZE_MAX) {
         uint32_t resp_len = test_0x01_idx;
-        int ret = uptl_send(UPTL_PKT_RESPONSE, 0x01, (uint8_t *)&resp_len, 4);
+        int ret = uptl_resp_send(0x01, (uint8_t *)&resp_len, 4);
         return ret;
     }
 
@@ -314,7 +314,7 @@ static int test_0x02_req(const uint8_t *data, const uint32_t len,
     for (size_t i = 0; i < TEST_BUF_SIZE; i++) {
         test_0x02_buf[i] = i % 256;
     }
-    int ret = uptl_send(UPTL_PKT_RESPONSE, 0x02, test_0x02_buf, TEST_BUF_SIZE);
+    int ret = uptl_resp_send(0x02, test_0x02_buf, TEST_BUF_SIZE);
     return ret;
 }
 
