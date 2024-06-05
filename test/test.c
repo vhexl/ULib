@@ -394,7 +394,7 @@ void test_uprotocol(void)
     test_0x02_idx = 0;
 
     // failed test
-    size_t pkt_len_max = UPTL_HEAD_SIZE + UPTL_BODY_SIZE_MAX;
+    uint32_t pkt_len_max = UPTL_HEAD_SIZE + UPTL_BODY_SIZE_MAX;
     // segment test
     struct uptl_pkt *test_pkt = (struct uptl_pkt *)(test_send_0x01_buf);
 
