@@ -62,7 +62,7 @@ extern const uint8_t __ext_uconfig_inst_max;
  * @retval UCFG_ERROR_SIZE_MISMATCH: if the size does not match the expected
  * size for the field.
  */
-int ucfg_read(const uint32_t field, uint8_t *data, const uint32_t size)
+int ucfg_read(uint32_t field, uint8_t *data, uint32_t size)
 {
     // Check if field index is valid
     if (field >= __ext_uconfig_field_map_max) {
@@ -103,7 +103,7 @@ int ucfg_read(const uint32_t field, uint8_t *data, const uint32_t size)
  *
  * @retval Other: interface return error
  */
-int ucfg_write(const uint32_t field, const uint8_t *data, const uint32_t size)
+int ucfg_write(uint32_t field, const uint8_t *data, uint32_t size)
 {
     // Check if field identifier is valid
     if (field >= __ext_uconfig_field_map_max) {
@@ -147,7 +147,7 @@ int ucfg_restore(void)
     memcpy(&__ext_uconfig_inst, &__ext_uconfig_inst_dflt,
            __ext_uconfig_inst_max);
 
-    for (size_t i = 0; i < __ext_uconfig_field_map_max; i++) {
+    for (uint32_t i = 0; i < __ext_uconfig_field_map_max; i++) {
         int ret = ucfg_write(i, UCFG_FIELD_IDX(i), UCFG_FIELD_SIZE(i));
         if (ret != UCFG_SUCCESS) {
             return ret;
@@ -172,7 +172,7 @@ int ucfg_init(void)
         return ret;
     }
 
-    for (size_t i = 0; i < __ext_uconfig_field_map_max; i++) {
+    for (uint32_t i = 0; i < __ext_uconfig_field_map_max; i++) {
         ret = uconfig_if_read(i, UCFG_FIELD_IDX(i), UCFG_FIELD_SIZE(i));
         if (ret != UCFG_SUCCESS) {
             return ret;
@@ -189,7 +189,7 @@ int ucfg_init(void)
  *
  * @return int From uconfig_if_deinit error code
  */
-int ucfg_deinit(void)
+extern inline int ucfg_deinit(void)
 {
     return uconfig_if_deinit();
 }

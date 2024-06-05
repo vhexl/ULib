@@ -51,9 +51,9 @@ enum ucfg_ret {
     UCFG_ERROR_INTERNAL,
 };
 
-int ucfg_read(const uint32_t field, uint8_t *data, const uint32_t size);
+int ucfg_read(uint32_t field, uint8_t *data, uint32_t size);
 
-int ucfg_write(const uint32_t field, const uint8_t *data, const uint32_t size);
+int ucfg_write(uint32_t field, const uint8_t *data, uint32_t size);
 
 int ucfg_restore(void);
 

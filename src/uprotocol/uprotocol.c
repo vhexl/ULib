@@ -127,7 +127,7 @@ static int __uptl_match(const struct uptl_pkt *pkt, uint32_t body_len)
  *
  * @retval UPTL_SUCCESS: Send success
  */
-inline int uptl_req_send(uint8_t cmd, const uint8_t *data, uint32_t len)
+extern inline int uptl_req_send(uint8_t cmd, const uint8_t *data, uint32_t len)
 {
     UPTL_PARAM_ASSERT(data != NULL && len > 0 || len == 0);
     return __uptl_send(UPTL_PKT_REQUEST, cmd, data, len);
@@ -144,7 +144,7 @@ inline int uptl_req_send(uint8_t cmd, const uint8_t *data, uint32_t len)
  *
  * @retval UPTL_SUCCESS: Send success
  */
-inline int uptl_resp_send(uint8_t cmd, const uint8_t *data, uint32_t len)
+extern inline int uptl_resp_send(uint8_t cmd, const uint8_t *data, uint32_t len)
 {
     UPTL_PARAM_ASSERT(data != NULL && len > 0 || len == 0);
     return __uptl_send(UPTL_PKT_RESPONSE, cmd, data, len);
@@ -160,7 +160,7 @@ inline int uptl_resp_send(uint8_t cmd, const uint8_t *data, uint32_t len)
  *
  * @retval UPTL_SUCCESS: Send success
  */
-inline int uptl_custom_send(struct uptl_pkt *pkt, uint32_t body_len)
+extern inline int uptl_custom_send(struct uptl_pkt *pkt, uint32_t body_len)
 {
     UPTL_PARAM_ASSERT(pkt != NULL);
     return uptl_if_send((const uint8_t *)pkt, body_len);
