@@ -359,50 +359,50 @@ const struct uptl_cmd_handler __ext_cmd_list[] = {
     // example implement
     // {
     //     .cmd         = 0x00,
-    //     .type     = UPTL_PKT_REQUEST,
+    //     .type     = UPTL_PKT_REQ,
     //     .segment = 1,
     //     .handler     = NULL,
     // },
     // ------CMD Handler List------
     // -------User Implement-------
     {
-        .head    = UPTL_HEAD_SET(UPTL_PKT_NOSEGMENT, UPTL_PKT_REQUEST, 0x00),
+        .head    = UPTL_HEAD_SET(UPTL_PKT_NOSEG, UPTL_PKT_REQ, 0x00),
         .handler = test_0x00_req,
     },
     {
-        .head    = UPTL_HEAD_SET(UPTL_PKT_NOSEGMENT, UPTL_PKT_RESPONSE, 0x00),
+        .head    = UPTL_HEAD_SET(UPTL_PKT_NOSEG, UPTL_PKT_RESP, 0x00),
         .handler = test_0x00_resp,
     },
     {
-        .head    = UPTL_HEAD_SET(UPTL_PKT_SEGMENT, UPTL_PKT_REQUEST, 0x01),
+        .head    = UPTL_HEAD_SET(UPTL_PKT_SEG, UPTL_PKT_REQ, 0x01),
         .handler = test_0x01_req,
     },
     {
-        .head    = UPTL_HEAD_SET(UPTL_PKT_NOSEGMENT, UPTL_PKT_RESPONSE, 0x01),
+        .head    = UPTL_HEAD_SET(UPTL_PKT_NOSEG, UPTL_PKT_RESP, 0x01),
         .handler = test_0x01_resp,
     },
     {
-        .head    = UPTL_HEAD_SET(UPTL_PKT_NOSEGMENT, UPTL_PKT_REQUEST, 0x02),
+        .head    = UPTL_HEAD_SET(UPTL_PKT_NOSEG, UPTL_PKT_REQ, 0x02),
         .handler = test_0x02_req,
     },
     {
-        .head    = UPTL_HEAD_SET(UPTL_PKT_SEGMENT, UPTL_PKT_RESPONSE, 0x02),
+        .head    = UPTL_HEAD_SET(UPTL_PKT_SEG, UPTL_PKT_RESP, 0x02),
         .handler = test_0x02_resp,
     },
     {
-        .head    = UPTL_HEAD_SET(UPTL_PKT_NOSEGMENT, UPTL_PKT_REQUEST, 0x03),
+        .head    = UPTL_HEAD_SET(UPTL_PKT_NOSEG, UPTL_PKT_REQ, 0x03),
         .handler = test_0x03_req,
     },
     {
-        .head    = UPTL_HEAD_SET(UPTL_PKT_NOSEGMENT, UPTL_PKT_RESPONSE, 0x03),
+        .head    = UPTL_HEAD_SET(UPTL_PKT_NOSEG, UPTL_PKT_RESP, 0x03),
         .handler = test_0x03_resp,
     },
     {
-        .head    = UPTL_HEAD_SET(UPTL_PKT_SEGMENT, UPTL_PKT_REQUEST, 0x04),
+        .head    = UPTL_HEAD_SET(UPTL_PKT_SEG, UPTL_PKT_REQ, 0x04),
         .handler = test_0x04_req,
     },
     {
-        .head    = UPTL_HEAD_SET(UPTL_PKT_SEGMENT, UPTL_PKT_RESPONSE, 0x04),
+        .head    = UPTL_HEAD_SET(UPTL_PKT_SEG, UPTL_PKT_RESP, 0x04),
         .handler = test_0x04_resp,
     },
     // ----------------------------

@@ -406,63 +406,58 @@ void test_uprotocol(void)
     TEST_ASSERT_EQUAL(ret, UPTL_ERROR_SEND_FAILED);
     uptl_if_send_flag = true; // set success retrun
 
-    test_pkt->head = UPTL_HEAD_SET(UPTL_PKT_SEGMENT, UPTL_PKT_REQUEST, 0x00);
+    test_pkt->head = UPTL_HEAD_SET(UPTL_PKT_SEG, UPTL_PKT_REQ, 0x00);
     ret            = uptl_custom_send(test_pkt, UPTL_BODY_SIZE_MAX / 2);
     TEST_ASSERT_EQUAL(ret, UPTL_ERROR_SEGMENT);
 
-    test_pkt->head = UPTL_HEAD_SET(UPTL_PKT_SEGMENT, UPTL_PKT_REQUEST, 0x01);
+    test_pkt->head = UPTL_HEAD_SET(UPTL_PKT_SEG, UPTL_PKT_REQ, 0x01);
     ret            = uptl_custom_send(test_pkt, UPTL_BODY_SIZE_MAX / 2);
     TEST_ASSERT_EQUAL(ret, UPTL_ERROR_SEGMENT_INAILD);
 
     // use uptl cache test
     for (size_t i = 0; i < 5; i++) {
-        test_pkt->head =
-            UPTL_HEAD_SET(UPTL_PKT_SEGMENT, UPTL_PKT_REQUEST, 0x01);
-        ret = uptl_custom_send(test_pkt, pkt_len_max);
+        test_pkt->head = UPTL_HEAD_SET(UPTL_PKT_SEG, UPTL_PKT_REQ, 0x01);
+        ret            = uptl_custom_send(test_pkt, pkt_len_max);
         TEST_ASSERT_EQUAL(ret, UPTL_SUCCESS);
     }
-    test_pkt->head = UPTL_HEAD_SET(UPTL_PKT_SEGMENT, UPTL_PKT_REQUEST, 0x01);
+    test_pkt->head = UPTL_HEAD_SET(UPTL_PKT_SEG, UPTL_PKT_REQ, 0x01);
     ret            = uptl_custom_send(test_pkt, UPTL_BODY_SIZE_MAX / 2);
     TEST_ASSERT_EQUAL(ret, UPTL_ERROR_SEGMENT_END);
     for (size_t i = 0; i < 5; i++) {
-        test_pkt->head =
-            UPTL_HEAD_SET(UPTL_PKT_SEGMENT, UPTL_PKT_REQUEST, 0x01);
-        ret = uptl_custom_send(test_pkt, pkt_len_max);
+        test_pkt->head = UPTL_HEAD_SET(UPTL_PKT_SEG, UPTL_PKT_REQ, 0x01);
+        ret            = uptl_custom_send(test_pkt, pkt_len_max);
         TEST_ASSERT_EQUAL(ret, UPTL_SUCCESS);
     }
-    test_pkt->head = UPTL_HEAD_SET(UPTL_PKT_NOSEGMENT, UPTL_PKT_REQUEST, 0x01);
+    test_pkt->head = UPTL_HEAD_SET(UPTL_PKT_NOSEG, UPTL_PKT_REQ, 0x01);
     ret            = uptl_custom_send(test_pkt, UPTL_BODY_SIZE_MAX / 2);
     TEST_ASSERT_EQUAL(ret, UPTL_ERROR_INTERNAL);
 
-    test_pkt->head = UPTL_HEAD_SET(UPTL_PKT_SEGMENT, UPTL_PKT_REQUEST, 0x01);
+    test_pkt->head       = UPTL_HEAD_SET(UPTL_PKT_SEG, UPTL_PKT_REQ, 0x01);
     uptl_if_timeout_flag = false; // set failed retrun
     ret                  = uptl_custom_send(test_pkt, pkt_len_max);
     TEST_ASSERT_EQUAL(ret, UPTL_ERROR_TIMER_START);
 
     uptl_if_timeout_flag = true; // set success return
     for (size_t i = 0; i < 5; i++) {
-        test_pkt->head =
-            UPTL_HEAD_SET(UPTL_PKT_SEGMENT, UPTL_PKT_REQUEST, 0x01);
-        ret = uptl_custom_send(test_pkt, pkt_len_max);
+        test_pkt->head = UPTL_HEAD_SET(UPTL_PKT_SEG, UPTL_PKT_REQ, 0x01);
+        ret            = uptl_custom_send(test_pkt, pkt_len_max);
         TEST_ASSERT_EQUAL(ret, UPTL_SUCCESS);
     }
-    test_pkt->head = UPTL_HEAD_SET(UPTL_PKT_SEGMENT, UPTL_PKT_REQUEST, 0x02);
+    test_pkt->head = UPTL_HEAD_SET(UPTL_PKT_SEG, UPTL_PKT_REQ, 0x02);
     ret            = uptl_custom_send(test_pkt, UPTL_BODY_SIZE_MAX / 2);
     TEST_ASSERT_EQUAL(ret, UPTL_ERROR_SEGMENT_END);
 
     test_0x01_idx = 0;
     for (size_t i = 0; i < 5; i++) {
-        test_pkt->head =
-            UPTL_HEAD_SET(UPTL_PKT_SEGMENT, UPTL_PKT_REQUEST, 0x01);
-        ret = uptl_custom_send(test_pkt, pkt_len_max);
+        test_pkt->head = UPTL_HEAD_SET(UPTL_PKT_SEG, UPTL_PKT_REQ, 0x01);
+        ret            = uptl_custom_send(test_pkt, pkt_len_max);
         TEST_ASSERT_EQUAL(ret, UPTL_SUCCESS);
     }
     test_timeout_handle(); // call timeout handle
 
     for (size_t i = 0; i < 5; i++) {
-        test_pkt->head =
-            UPTL_HEAD_SET(UPTL_PKT_SEGMENT, UPTL_PKT_REQUEST, 0x01);
-        ret = uptl_custom_send(test_pkt, pkt_len_max);
+        test_pkt->head = UPTL_HEAD_SET(UPTL_PKT_SEG, UPTL_PKT_REQ, 0x01);
+        ret            = uptl_custom_send(test_pkt, pkt_len_max);
         TEST_ASSERT_EQUAL(ret, UPTL_SUCCESS);
     }
 
@@ -552,16 +547,15 @@ void test_uprotocol(void)
     TEST_ASSERT_EQUAL(uptl_ext_flag, UPTL_EXT_NOSEG);
 
     // 0x04 request test
-    test_pkt->head = UPTL_HEAD_SET(UPTL_PKT_SEGMENT, UPTL_PKT_REQUEST, 0x04);
+    test_pkt->head = UPTL_HEAD_SET(UPTL_PKT_SEG, UPTL_PKT_REQ, 0x04);
     ret            = uptl_custom_send(test_pkt, pkt_len_max);
     TEST_ASSERT_EQUAL(uptl_ext_flag, UPTL_EXT_SEG_START);
     for (size_t i = 0; i < 5; i++) {
-        test_pkt->head =
-            UPTL_HEAD_SET(UPTL_PKT_SEGMENT, UPTL_PKT_REQUEST, 0x04);
-        ret = uptl_custom_send(test_pkt, pkt_len_max);
+        test_pkt->head = UPTL_HEAD_SET(UPTL_PKT_SEG, UPTL_PKT_REQ, 0x04);
+        ret            = uptl_custom_send(test_pkt, pkt_len_max);
         TEST_ASSERT_EQUAL(uptl_ext_flag, UPTL_EXT_SEG_CONTINUE);
     }
-    test_pkt->head = UPTL_HEAD_SET(UPTL_PKT_NOSEGMENT, UPTL_PKT_REQUEST, 0x04);
+    test_pkt->head = UPTL_HEAD_SET(UPTL_PKT_NOSEG, UPTL_PKT_REQ, 0x04);
     ret            = uptl_custom_send(test_pkt, pkt_len_max);
     TEST_ASSERT_EQUAL(uptl_ext_flag, UPTL_EXT_SEG_END);
 
@@ -569,16 +563,15 @@ void test_uprotocol(void)
     TEST_ASSERT_EQUAL(uptl_ext_flag, UPTL_EXT_NOSEG);
 
     // 0x04 response test
-    test_pkt->head = UPTL_HEAD_SET(UPTL_PKT_SEGMENT, UPTL_PKT_RESPONSE, 0x04);
+    test_pkt->head = UPTL_HEAD_SET(UPTL_PKT_SEG, UPTL_PKT_RESP, 0x04);
     ret            = uptl_custom_send(test_pkt, pkt_len_max);
     TEST_ASSERT_EQUAL(uptl_ext_flag, UPTL_EXT_SEG_START);
     for (size_t i = 0; i < 5; i++) {
-        test_pkt->head =
-            UPTL_HEAD_SET(UPTL_PKT_SEGMENT, UPTL_PKT_RESPONSE, 0x04);
-        ret = uptl_custom_send(test_pkt, pkt_len_max);
+        test_pkt->head = UPTL_HEAD_SET(UPTL_PKT_SEG, UPTL_PKT_RESP, 0x04);
+        ret            = uptl_custom_send(test_pkt, pkt_len_max);
         TEST_ASSERT_EQUAL(uptl_ext_flag, UPTL_EXT_SEG_CONTINUE);
     }
-    test_pkt->head = UPTL_HEAD_SET(UPTL_PKT_NOSEGMENT, UPTL_PKT_RESPONSE, 0x04);
+    test_pkt->head = UPTL_HEAD_SET(UPTL_PKT_NOSEG, UPTL_PKT_RESP, 0x04);
     ret            = uptl_custom_send(test_pkt, pkt_len_max);
     TEST_ASSERT_EQUAL(uptl_ext_flag, UPTL_EXT_SEG_END);
 

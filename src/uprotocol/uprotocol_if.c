@@ -18,7 +18,7 @@ static int __example_cmd_handler(const uint8_t *data, size_t len,
                                  enum uptl_ext ext)
 {
     uint8_t resp[2] = {0x11, 0x22};
-    uptl_send(UPTL_PKT_RESPONSE, 0x00, resp, 2);
+    uptl_send(UPTL_PKT_RESP, 0x00, resp, 2);
 
     switch (ext) {
         case UPTL_EXT_NOSEG:
@@ -39,7 +39,7 @@ static int __example_cmd_handler(const uint8_t *data, size_t len,
 const struct uptl_cmd_handler __ext_cmd_list[] = {
     // example implement
     {
-        .head    = UPTL_HEAD_SET(UPTL_PKT_NOSEGMENT, UPTL_PKT_REQUEST, 0x00),
+        .head    = UPTL_HEAD_SET(UPTL_PKT_NOSEG, UPTL_PKT_REQ, 0x00),
         .handler = __example_cmd_handler,
     },
     // ------------------------------------------------------------------------

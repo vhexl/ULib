@@ -108,13 +108,13 @@ struct uptl_cache {
 };
 
 enum uptl_pkt_type {
-    UPTL_PKT_REQUEST  = 0,
-    UPTL_PKT_RESPONSE = UPTL_PKT_TYPE_MASK,
+    UPTL_PKT_REQ  = 0,
+    UPTL_PKT_RESP = UPTL_PKT_TYPE_MASK,
 };
 
 enum uptl_pkt_seg {
-    UPTL_PKT_NOSEGMENT = 0,
-    UPTL_PKT_SEGMENT   = UPTL_PKT_SEG_MASK,
+    UPTL_PKT_NOSEG = 0,
+    UPTL_PKT_SEG   = UPTL_PKT_SEG_MASK,
 };
 
 enum uptl_ret {

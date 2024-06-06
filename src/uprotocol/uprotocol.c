@@ -53,11 +53,11 @@ static int __uptl_send(enum uptl_pkt_type type, uint8_t cmd,
     while (len > 0) {
         // function recursion `__uptl_static_buf` may be modified.
         if (len > UPTL_BODY_SIZE_MAX) {
-            pkt->head = UPTL_HEAD_SET(UPTL_PKT_SEGMENT, type, cmd);
+            pkt->head = UPTL_HEAD_SET(UPTL_PKT_SEG, type, cmd);
             body_size = UPTL_BODY_SIZE_MAX;
             len -= UPTL_BODY_SIZE_MAX;
         } else {
-            pkt->head = UPTL_HEAD_SET(UPTL_PKT_NOSEGMENT, type, cmd);
+            pkt->head = UPTL_HEAD_SET(UPTL_PKT_NOSEG, type, cmd);
             body_size = len;
             len       = 0;
         }
@@ -130,7 +130,7 @@ static int __uptl_match(const struct uptl_pkt *pkt, size_t body_len)
 extern inline int uptl_req_send(uint8_t cmd, const uint8_t *data, size_t len)
 {
     UPTL_PARAM_ASSERT(data != NULL && len > 0 || len == 0);
-    return __uptl_send(UPTL_PKT_REQUEST, cmd, data, len);
+    return __uptl_send(UPTL_PKT_REQ, cmd, data, len);
 }
 
 /**
@@ -147,7 +147,7 @@ extern inline int uptl_req_send(uint8_t cmd, const uint8_t *data, size_t len)
 extern inline int uptl_resp_send(uint8_t cmd, const uint8_t *data, size_t len)
 {
     UPTL_PARAM_ASSERT(data != NULL && len > 0 || len == 0);
-    return __uptl_send(UPTL_PKT_RESPONSE, cmd, data, len);
+    return __uptl_send(UPTL_PKT_RESP, cmd, data, len);
 }
 
 /**
