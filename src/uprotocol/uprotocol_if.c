@@ -14,8 +14,8 @@
 #include "ULib.h"
 
 // just example implement
-static uint32_t __example_cmd_handler(const uint8_t *data, size_t len,
-                                      enum uptl_ext ext)
+static int __example_cmd_handler(const uint8_t *data, size_t len,
+                                 enum uptl_ext ext)
 {
     uint8_t resp[2] = {0x11, 0x22};
     uptl_send(UPTL_PKT_RESPONSE, 0x00, resp, 2);
@@ -36,7 +36,7 @@ static uint32_t __example_cmd_handler(const uint8_t *data, size_t len,
     return UPTL_SUCCESS;
 }
 
-struct uptl_cmd_handler __ext_cmd_list[] = {
+const struct uptl_cmd_handler __ext_cmd_list[] = {
     // example implement
     {
         .head    = UPTL_HEAD_SET(UPTL_PKT_NOSEGMENT, UPTL_PKT_REQUEST, 0x00),
@@ -51,7 +51,7 @@ struct uptl_cmd_handler __ext_cmd_list[] = {
     // ------------------------------------------------------------------------
 
 };
-int __ext_cmd_list_len = sizeof(__ext_cmd_list);
+const size_t __ext_cmd_list_len = sizeof(__ext_cmd_list);
 
 /**
  * @brief Uprotocol send data interface

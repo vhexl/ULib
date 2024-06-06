@@ -355,7 +355,7 @@ static int test_0x04_resp(const uint8_t *data, size_t len, enum uptl_ext ext)
     return UPTL_SUCCESS;
 }
 
-struct uptl_cmd_handler __ext_cmd_list[] = {
+const struct uptl_cmd_handler __ext_cmd_list[] = {
     // example implement
     // {
     //     .cmd         = 0x00,
@@ -407,7 +407,7 @@ struct uptl_cmd_handler __ext_cmd_list[] = {
     },
     // ----------------------------
 };
-uint32_t __ext_cmd_list_len = ULIB_ARRAY_MAX(__ext_cmd_list);
+const size_t __ext_cmd_list_len = ULIB_ARRAY_MAX(__ext_cmd_list);
 
 int uptl_if_send(const uint8_t *data, size_t len)
 {

@@ -20,7 +20,7 @@
 //                          External Variables
 // ------------------------------------------------------------------------
 extern const struct uptl_cmd_handler __ext_cmd_list[];
-extern const uint32_t __ext_cmd_list_len;
+extern const size_t __ext_cmd_list_len;
 
 // ------------------------------------------------------------------------
 //                          Private Variables
@@ -46,9 +46,9 @@ static void __uptl_timeout_handler(void)
 static int __uptl_send(enum uptl_pkt_type type, uint8_t cmd,
                        const uint8_t *data, size_t len)
 {
-    struct uptl_pkt *pkt     = (struct uptl_pkt *)__uptl_static_buf;
-    const uint32_t head_size = UPTL_HEAD_SIZE;
-    uint32_t body_size       = 0;
+    struct uptl_pkt *pkt   = (struct uptl_pkt *)__uptl_static_buf;
+    const size_t head_size = UPTL_HEAD_SIZE;
+    size_t body_size       = 0;
 
     while (len > 0) {
         // function recursion `__uptl_static_buf` may be modified.
