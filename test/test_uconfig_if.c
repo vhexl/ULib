@@ -44,7 +44,7 @@ double f7   = 1.777777777777777;
 char f8[6]  = {'1', '2', '3', '4', '5', '6'};
 uint32_t magic;
 
-const struct uconfig_inst __ext_uconfig_inst_dflt = {
+const struct uconfig_inst __ext_ucfg_inst_dflt = {
     // -------Default Value--------
     // -------User Implement-------
     .f1 = true,
@@ -58,8 +58,8 @@ const struct uconfig_inst __ext_uconfig_inst_dflt = {
     // ----------------------------
     .magic = 0x11223344,
 };
-struct uconfig_inst __ext_uconfig_inst  = {0};
-const uint8_t __ext_uconfig_field_map[] = {
+struct uconfig_inst __ext_ucfg_inst = {0};
+const size_t __ext_ucfg_ofs_map[] = {
     // -------Field offset---------
     // -------User Implement-------
     offsetof(struct uconfig_inst, f1),
@@ -74,8 +74,8 @@ const uint8_t __ext_uconfig_field_map[] = {
     offsetof(struct uconfig_inst, magic),
     sizeof(struct uconfig_inst),
 };
-const uint8_t __ext_uconfig_field_map_max = sizeof(__ext_uconfig_field_map) - 1;
-const uint8_t __ext_uconfig_inst_max      = sizeof(struct uconfig_inst);
+const size_t __ext_ucfg_ofs_map_max = ULIB_ARRAY_MAX(__ext_ucfg_ofs_map) - 1;
+const size_t __ext_ucfg_inst_max      = sizeof(struct uconfig_inst);
 
 // ------------------------------------------------------------------------
 //                           User Implementation
@@ -94,7 +94,7 @@ int uconfig_if_init(void)
 {
     // ---------------Initialize---------------
     // -------------User Implement-------------
-    if (!test_init_if_flag){
+    if (!test_init_if_flag) {
         return UCFG_ERROR_INTERNAL;
     }
     // ----------------------------------------
@@ -136,7 +136,7 @@ int uconfig_if_deinit(void)
  * @retval UCFG_IF_SUCCESS: if the data was successfully written
  * @retval Other: interface return error
  */
-int uconfig_if_read(const uint32_t field, uint8_t *data, const uint32_t size)
+int uconfig_if_read(size_t field, uint8_t *data, size_t size)
 {
     // --------------Read data from persistent storage-------------
     // ----------------------User Implement------------------------
@@ -194,8 +194,7 @@ int uconfig_if_read(const uint32_t field, uint8_t *data, const uint32_t size)
  * @retval UCFG_IF_SUCCESS: if the data was successfully written
  * @retval Other: interface return error
  */
-int uconfig_if_write(const uint32_t field, const uint8_t *data,
-                     const uint32_t size)
+int uconfig_if_write(size_t field, const uint8_t *data, size_t size)
 {
     // --------------Write data from persistent storage-------------
     // ----------------------User Implement------------------------

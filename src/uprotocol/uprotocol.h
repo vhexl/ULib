@@ -90,8 +90,7 @@ enum uptl_ext {
 
 typedef uint8_t uptl_head_t;
 
-typedef int (*cmd_handler)(const uint8_t *data, uint32_t len,
-                           enum uptl_ext ext);
+typedef int (*cmd_handler)(const uint8_t *data, size_t len, enum uptl_ext ext);
 
 struct uptl_cmd_handler {
     uptl_head_t head;
@@ -136,12 +135,12 @@ enum uptl_ret {
 //                           Public Functions
 // ------------------------------------------------------------------------
 
-int uptl_req_send(uint8_t cmd, const uint8_t *data, uint32_t len);
+int uptl_req_send(uint8_t cmd, const uint8_t *data, size_t len);
 
-int uptl_resp_send(uint8_t cmd, const uint8_t *data, uint32_t len);
+int uptl_resp_send(uint8_t cmd, const uint8_t *data, size_t len);
 
-int uptl_custom_send(struct uptl_pkt *pkt, uint32_t body_len);
+int uptl_custom_send(struct uptl_pkt *pkt, size_t body_len);
 
-int uptl_process(const uint8_t *data, uint32_t len);
+int uptl_process(const uint8_t *data, size_t len);
 
 #endif

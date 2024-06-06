@@ -44,7 +44,7 @@ static void __uptl_timeout_handler(void)
 }
 
 static int __uptl_send(enum uptl_pkt_type type, uint8_t cmd,
-                       const uint8_t *data, uint32_t len)
+                       const uint8_t *data, size_t len)
 {
     struct uptl_pkt *pkt     = (struct uptl_pkt *)__uptl_static_buf;
     const uint32_t head_size = UPTL_HEAD_SIZE;
@@ -76,7 +76,7 @@ static int __uptl_send(enum uptl_pkt_type type, uint8_t cmd,
     return UPTL_SUCCESS;
 }
 
-static int __uptl_match(const struct uptl_pkt *pkt, uint32_t body_len)
+static int __uptl_match(const struct uptl_pkt *pkt, size_t body_len)
 {
     const bool is_seg = (bool)UPTL_PKT_SEG_GET(pkt->head);
 
@@ -127,7 +127,7 @@ static int __uptl_match(const struct uptl_pkt *pkt, uint32_t body_len)
  *
  * @retval UPTL_SUCCESS: Send success
  */
-extern inline int uptl_req_send(uint8_t cmd, const uint8_t *data, uint32_t len)
+extern inline int uptl_req_send(uint8_t cmd, const uint8_t *data, size_t len)
 {
     UPTL_PARAM_ASSERT(data != NULL && len > 0 || len == 0);
     return __uptl_send(UPTL_PKT_REQUEST, cmd, data, len);
@@ -144,7 +144,7 @@ extern inline int uptl_req_send(uint8_t cmd, const uint8_t *data, uint32_t len)
  *
  * @retval UPTL_SUCCESS: Send success
  */
-extern inline int uptl_resp_send(uint8_t cmd, const uint8_t *data, uint32_t len)
+extern inline int uptl_resp_send(uint8_t cmd, const uint8_t *data, size_t len)
 {
     UPTL_PARAM_ASSERT(data != NULL && len > 0 || len == 0);
     return __uptl_send(UPTL_PKT_RESPONSE, cmd, data, len);
@@ -160,7 +160,7 @@ extern inline int uptl_resp_send(uint8_t cmd, const uint8_t *data, uint32_t len)
  *
  * @retval UPTL_SUCCESS: Send success
  */
-extern inline int uptl_custom_send(struct uptl_pkt *pkt, uint32_t body_len)
+extern inline int uptl_custom_send(struct uptl_pkt *pkt, size_t body_len)
 {
     UPTL_PARAM_ASSERT(pkt != NULL);
     return uptl_if_send((const uint8_t *)pkt, body_len);
@@ -180,7 +180,7 @@ extern inline int uptl_custom_send(struct uptl_pkt *pkt, uint32_t body_len)
  * @retval UPTL_SUCCESS if the package is processed successfully
  * @retval UPTL_ERR_PACK_LEN if the package length is invalid
  */
-int uptl_process(const uint8_t *data, uint32_t len)
+int uptl_process(const uint8_t *data, size_t len)
 {
     UPTL_PARAM_ASSERT(data != NULL && len > 0);
 

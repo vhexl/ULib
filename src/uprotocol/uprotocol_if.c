@@ -14,8 +14,8 @@
 #include "ULib.h"
 
 // just example implement
-static uint32_t __example_cmd_handler(const uint8_t *data, const uint32_t len,
-                                      const enum uptl_ext ext)
+static uint32_t __example_cmd_handler(const uint8_t *data, size_t len,
+                                      enum uptl_ext ext)
 {
     uint8_t resp[2] = {0x11, 0x22};
     uptl_send(UPTL_PKT_RESPONSE, 0x00, resp, 2);
@@ -63,7 +63,7 @@ int __ext_cmd_list_len = sizeof(__ext_cmd_list);
  * @retval UPTL_SUCCESS: Initialization success
  * @retval Other: send failure
  */
-int uptl_if_send(const uint8_t *data, const uint32_t len)
+int uptl_if_send(const uint8_t *data, size_t len)
 {
     // ------------------------------------------------------------------------
     //                          User Implement Start

@@ -26,8 +26,8 @@ int uconfig_if_init(void);
 
 int uconfig_if_deinit(void);
 
-int uconfig_if_read(const uint32_t field, uint8_t *data, const uint32_t size);
+int uconfig_if_read(size_t field, uint8_t *data, size_t size);
 
-int uconfig_if_write(const uint32_t field, const uint8_t *data, const uint32_t size);
+int uconfig_if_write(size_t field, const uint8_t *data, size_t size);
 
 #endif

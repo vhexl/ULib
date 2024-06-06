@@ -27,7 +27,7 @@ PACK(struct uconfig_inst {
     uint32_t magic;
 });
 
-const struct uconfig_inst __ext_uconfig_inst_dflt = {
+const struct uconfig_inst __ext_ucfg_inst_dflt = {
     // ------------------------------------------------------------------------
     //                          User Implement Start
     // ------------------------------------------------------------------------
@@ -38,8 +38,8 @@ const struct uconfig_inst __ext_uconfig_inst_dflt = {
 
     .magic = 0x11223344,
 };
-struct uconfig_inst __ext_uconfig_inst  = {0};
-const uint8_t __ext_uconfig_field_map[] = {
+struct uconfig_inst __ext_ucfg_inst = {0};
+const size_t __ext_ucfg_ofs_map[]   = {
     // ------------------------------------------------------------------------
     //                          User Implement Start
     // ------------------------------------------------------------------------
@@ -51,8 +51,8 @@ const uint8_t __ext_uconfig_field_map[] = {
     offsetof(struct uconfig_inst, magic),
     sizeof(struct uconfig_inst),
 };
-const uint8_t __ext_uconfig_field_map_max = sizeof(__ext_uconfig_field_map) - 1;
-const uint8_t __ext_uconfig_inst_max      = sizeof(struct uconfig_inst);
+const size_t __ext_ucfg_ofs_map_max = ULIB_ARRAY_MAX(__ext_ucfg_ofs_map) - 1;
+const size_t __ext_ucfg_inst_max    = sizeof(struct uconfig_inst);
 
 // ------------------------------------------------------------------------
 //                           User Implementation
@@ -113,7 +113,7 @@ int uconfig_if_deinit(void)
  * @retval UCFG_IF_SUCCESS: if the data was successfully written
  * @retval Other: interface return error
  */
-int uconfig_if_read(const uint32_t field, uint8_t *data, const uint32_t size)
+int uconfig_if_read(size_t field, uint8_t *data, size_t size)
 {
     // ------------------------------------------------------------------------
     //                          User Implement Start
@@ -140,8 +140,7 @@ int uconfig_if_read(const uint32_t field, uint8_t *data, const uint32_t size)
  * @retval UCFG_IF_SUCCESS: if the data was successfully written
  * @retval Other: interface return error
  */
-int uconfig_if_write(const uint32_t field, const uint8_t *data,
-                     const uint32_t size)
+int uconfig_if_write(size_t field, const uint8_t *data, size_t size)
 {
     // ------------------------------------------------------------------------
     //                          User Implement Start

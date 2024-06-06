@@ -13,6 +13,7 @@
 #ifndef __UCONFIG_H
 #define __UCONFIG_H
 
+#include <stddef.h>
 #include <stdint.h>
 #include <stdbool.h>
 
@@ -51,9 +52,9 @@ enum ucfg_ret {
     UCFG_ERROR_INTERNAL,
 };
 
-int ucfg_read(uint32_t field, uint8_t *data, uint32_t size);
+int ucfg_read(size_t field, uint8_t *data, size_t size);
 
-int ucfg_write(uint32_t field, const uint8_t *data, uint32_t size);
+int ucfg_write(size_t field, const uint8_t *data, size_t size);
 
 int ucfg_restore(void);
 

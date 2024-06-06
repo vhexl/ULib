@@ -42,8 +42,7 @@ double test_0x00_p6   = 2.14444444444;
 bool test_0x00_p7     = true;
 char test_0x00_p8[16] = "123456789abcdef";
 
-static int test_0x00_req(const uint8_t *data, const uint32_t len,
-                         const enum uptl_ext ext)
+static int test_0x00_req(const uint8_t *data, size_t len, enum uptl_ext ext)
 {
     // data read
     if (len == 1) {
@@ -95,8 +94,7 @@ static int test_0x00_req(const uint8_t *data, const uint32_t len,
                 uint8_t resp[1 + sizeof(bool)];
                 resp[0] = 7;
                 memcpy(resp + 1, &test_0x00_p7, sizeof(bool));
-                int ret =
-                    uptl_resp_send(0x00, resp, sizeof(bool) + 1);
+                int ret = uptl_resp_send(0x00, resp, sizeof(bool) + 1);
                 return ret;
             }
             case 8: {
@@ -186,8 +184,7 @@ static int test_0x00_req(const uint8_t *data, const uint32_t len,
                 uint8_t resp[1 + sizeof(bool)];
                 resp[0] = 7;
                 memcpy(resp + 1, &test_0x00_p7, sizeof(bool));
-                int ret =
-                    uptl_resp_send(0x00, resp, sizeof(bool) + 1);
+                int ret = uptl_resp_send(0x00, resp, sizeof(bool) + 1);
                 return ret;
             }
             case 8: {
@@ -211,8 +208,7 @@ static int test_0x00_req(const uint8_t *data, const uint32_t len,
     return UPTL_SUCCESS;
 }
 
-static int test_0x00_resp(const uint8_t *data, const uint32_t len,
-                          const enum uptl_ext ext)
+static int test_0x00_resp(const uint8_t *data, size_t len, enum uptl_ext ext)
 {
     // check
     if (len > 1) {
@@ -267,8 +263,7 @@ static int test_0x00_resp(const uint8_t *data, const uint32_t len,
     return UPTL_SUCCESS;
 }
 
-static int test_0x01_req(const uint8_t *data, const uint32_t len,
-                         const enum uptl_ext ext)
+static int test_0x01_req(const uint8_t *data, size_t len, enum uptl_ext ext)
 {
     if (test_0x01_idx + len > TEST_BUF_SIZE) {
         return UPTL_ERROR_INVAILD_PARAM;
@@ -280,15 +275,14 @@ static int test_0x01_req(const uint8_t *data, const uint32_t len,
 
     if (len < UPTL_BODY_SIZE_MAX) {
         uint32_t resp_len = test_0x01_idx;
-        int ret = uptl_resp_send(0x01, (uint8_t *)&resp_len, 4);
+        int ret           = uptl_resp_send(0x01, (uint8_t *)&resp_len, 4);
         return ret;
     }
 
     return UPTL_SUCCESS;
 }
 
-static int test_0x01_resp(const uint8_t *data, const uint32_t len,
-                          const enum uptl_ext ext)
+static int test_0x01_resp(const uint8_t *data, size_t len, enum uptl_ext ext)
 {
     if (len != 4) {
         return UPTL_ERROR_INTERNAL;
@@ -308,8 +302,7 @@ static int test_0x01_resp(const uint8_t *data, const uint32_t len,
     return UPTL_SUCCESS;
 }
 
-static int test_0x02_req(const uint8_t *data, const uint32_t len,
-                         const enum uptl_ext ext)
+static int test_0x02_req(const uint8_t *data, size_t len, enum uptl_ext ext)
 {
     for (size_t i = 0; i < TEST_BUF_SIZE; i++) {
         test_0x02_buf[i] = i % 256;
@@ -318,8 +311,7 @@ static int test_0x02_req(const uint8_t *data, const uint32_t len,
     return ret;
 }
 
-static int test_0x02_resp(const uint8_t *data, const uint32_t len,
-                          const enum uptl_ext ext)
+static int test_0x02_resp(const uint8_t *data, size_t len, enum uptl_ext ext)
 {
     if (test_0x01_idx + len > TEST_BUF_SIZE) {
         return UPTL_ERROR_INTERNAL;
@@ -336,31 +328,27 @@ static int test_0x02_resp(const uint8_t *data, const uint32_t len,
     return UPTL_SUCCESS;
 }
 
-static int test_0x03_req(const uint8_t *data, const uint32_t len,
-                          const enum uptl_ext ext)
+static int test_0x03_req(const uint8_t *data, size_t len, enum uptl_ext ext)
 {
     uptl_ext_flag = ext;
     return UPTL_SUCCESS;
 }
 
-static int test_0x03_resp(const uint8_t *data, const uint32_t len,
-                          const enum uptl_ext ext)
-{
-    uptl_ext_flag = ext;
-
-    return UPTL_SUCCESS;
-}
-
-static int test_0x04_req(const uint8_t *data, const uint32_t len,
-                          const enum uptl_ext ext)
+static int test_0x03_resp(const uint8_t *data, size_t len, enum uptl_ext ext)
 {
     uptl_ext_flag = ext;
 
     return UPTL_SUCCESS;
 }
 
-static int test_0x04_resp(const uint8_t *data, const uint32_t len,
-                          const enum uptl_ext ext)
+static int test_0x04_req(const uint8_t *data, size_t len, enum uptl_ext ext)
+{
+    uptl_ext_flag = ext;
+
+    return UPTL_SUCCESS;
+}
+
+static int test_0x04_resp(const uint8_t *data, size_t len, enum uptl_ext ext)
 {
     uptl_ext_flag = ext;
 
@@ -409,7 +397,7 @@ struct uptl_cmd_handler __ext_cmd_list[] = {
         .head    = UPTL_HEAD_SET(UPTL_PKT_NOSEGMENT, UPTL_PKT_RESPONSE, 0x03),
         .handler = test_0x03_resp,
     },
-        {
+    {
         .head    = UPTL_HEAD_SET(UPTL_PKT_SEGMENT, UPTL_PKT_REQUEST, 0x04),
         .handler = test_0x04_req,
     },
@@ -421,7 +409,7 @@ struct uptl_cmd_handler __ext_cmd_list[] = {
 };
 uint32_t __ext_cmd_list_len = ULIB_ARRAY_MAX(__ext_cmd_list);
 
-int uptl_if_send(const uint8_t *data, const uint32_t len)
+int uptl_if_send(const uint8_t *data, size_t len)
 {
     // ------------------------------------------------------------------------
     //                          User Implement Start
