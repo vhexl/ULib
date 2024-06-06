@@ -145,7 +145,7 @@ int ucfg_restore(void)
 {
     memcpy(&__ext_ucfg_inst, &__ext_ucfg_inst_dflt, __ext_ucfg_inst_max);
 
-    for (uint32_t i = 0; i < __ext_ucfg_ofs_map_max; i++) {
+    for (size_t i = 0; i < __ext_ucfg_ofs_map_max; i++) {
         int ret = ucfg_write(i, UCFG_FIELD_IDX(i), UCFG_FIELD_SIZE(i));
         if (ret != UCFG_SUCCESS) {
             return ret;

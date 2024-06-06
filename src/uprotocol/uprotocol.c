@@ -185,7 +185,7 @@ int uptl_process(const uint8_t *data, size_t len)
     UPTL_PARAM_ASSERT(data != NULL && len > 0);
 
     const struct uptl_pkt *pkt = (const struct uptl_pkt *)data;
-    const uint32_t body_len    = len - UPTL_HEAD_SIZE;
+    const size_t body_len      = len - UPTL_HEAD_SIZE;
 
     // check cache
     if (__pkt_cache.hdl != NULL) {

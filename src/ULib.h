@@ -37,7 +37,7 @@
     (((x) >> 0x18) & 0xFF), (((x) >> 0x10) & 0xFF), (((x) >> 0x08) & 0xFF),    \
         (((x) >> 0x00) & 0xFF)
 
-#define ULIB_ARRAY_MAX(list_name) (sizeof(list_name) / sizeof(list_name[0]))
+#define ULIB_ARRAY_MAX(list) (sizeof(list) / sizeof(list[0]))
 
 #if defined __GNUC__
 #define PACK(__Declaration__) __Declaration__ __attribute__((__packed__))

@@ -51,7 +51,7 @@ const struct uptl_cmd_handler __ext_cmd_list[] = {
     // ------------------------------------------------------------------------
 
 };
-const size_t __ext_cmd_list_len = sizeof(__ext_cmd_list);
+const size_t __ext_cmd_list_len = ULIB_ARRAY_MAX(__ext_cmd_list);
 
 /**
  * @brief Uprotocol send data interface
