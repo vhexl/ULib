@@ -84,7 +84,7 @@ int uptl_if_send(const uint8_t *data, size_t len)
  * @retval UPTL_SUCCESS: Start timer success
  * @retval Other: send failure
  */
-int uptl_if_timeout(timeout_handler hdl)
+int uptl_if_timeout_restart(timeout_handler hdl)
 {
     // ------------------------------------------------------------------------
     //                          User Implement Start

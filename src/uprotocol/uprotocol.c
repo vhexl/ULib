@@ -96,11 +96,6 @@ static int __uptl_match(const struct uptl_pkt *pkt, size_t body_len)
                 __pkt_cache.head = pkt->head;
                 __pkt_cache.hdl  = __ext_cmd_list[i].handler;
 
-                int ret = uptl_if_timeout(__uptl_timeout_handler);
-                if (ret != UPTL_SUCCESS) {
-                    return ret;
-                }
-
                 return __ext_cmd_list[i].handler(pkt->body, body_len,
                                                  UPTL_EXT_SEG_START);
             }
@@ -186,6 +181,11 @@ int uptl_process(const uint8_t *data, size_t len)
 
     const struct uptl_pkt *pkt = (const struct uptl_pkt *)data;
     const size_t body_len      = len - UPTL_HEAD_SIZE;
+
+    int ret = uptl_if_timeout_restart(__uptl_timeout_handler);
+    if (ret != UPTL_SUCCESS) {
+        return ret;
+    }
 
     // check cache
     if (__pkt_cache.hdl != NULL) {
